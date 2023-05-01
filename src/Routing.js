@@ -14,6 +14,10 @@ import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import PinterestIcon from '@mui/icons-material/Pinterest';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Home from './Home/Home';
+import Filter from './Filter/Filter';
+import Product from './Product/Product';
 
 const Routing = () => {
   const Search = styled("div")(({ theme }) => ({
@@ -59,6 +63,7 @@ const Routing = () => {
   }));
 
   return (
+    <BrowserRouter>
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ background: "white", color: "black" }}>
         <Toolbar sx={{ padding: "20px", height: "80px" }}>
@@ -209,6 +214,14 @@ const Routing = () => {
         </Container>
       </Box>
     </Box>
+    <Routes>
+          <Route path="/Home" element={<Home />}></Route>
+          <Route path="/Product" element={<Product />}></Route>
+          <Route path="/Filter" element={<Filter />}></Route>
+          
+          <Route path="*" element={<Navigate to="/Home"></Navigate>}></Route>
+        </Routes>
+    </BrowserRouter>
   );
 };
 

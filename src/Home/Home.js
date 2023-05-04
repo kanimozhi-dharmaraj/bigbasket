@@ -1,36 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-import { CardActionArea, FormControl, MenuItem, Select, TextField } from "@mui/material";
+import {
+  Button,
+  CardActionArea,
+  FormControl,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import Grid from "@mui/material/Grid";
+import Products from "../Products.json";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const [items, setItems] = useState([]);
+  //   const [items, setItems] = useState([]);
   const [prices, setPrices] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
-  const getPosts = async () => {
-    try {
-      const response = await fetch(
-        "https://dummyjson.com/products?skip=14&limit=8"
-      );
-      const json = await response.json();
-      setItems(json["products"]);
-      setSelectedPrices(
-        json["products"].map((item) =>
-          (item.price - (item.price * item.discountPercentage) / 100).toFixed(2)
-        )
-      );
+  const [counter, setCounter] = useState(0);
+  const navigate = useNavigate();
+  //   const getPosts = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://dummyjson.com/products?skip=14&limit=8"
+  //       );
+  //       const json = await response.json();
+  //       setItems(json["products"]);
+  //       setSelectedPrices(
+  //         json["products"].map((item) =>
+  //           (item.price - (item.price * item.discountPercentage) / 100).toFixed(2)
+  //         )
+  //       );
 
-      console.log(json);
-    } catch (error) {
-      console.log("Error", error);
-    }
-  };
-  useEffect(() => {
-    getPosts();
-  }, []);
+  //       console.log(json);
+  //     } catch (error) {
+  //       console.log("Error", error);
+  //     }
+  //   };
+  //   useEffect(() => {
+  //     getPosts();
+  //   }, []);
   const handlePrice = (e, index) => {
     const itemPrice = e.target.value;
     setPrices((prevPrices) => {
@@ -40,33 +50,48 @@ const Home = () => {
     });
     setSelectedPrices((prevSelectedPrices) => {
       const newSelectedPrices = [...prevSelectedPrices];
-      newSelectedPrices[index] = (
-        itemPrice -
-        (itemPrice * items[index].discountPercentage) / 100
-      ).toFixed(2);
+      newSelectedPrices[index] = e.target.value;
+      console.log(newSelectedPrices[index]);
       return newSelectedPrices;
     });
+  };
+  const incrementCount = () => {
+    console.log(`increment - ${counter}`);
+    // Update state with incremented value
+    setCounter(counter + 1);
+  };
+
+  const decrementCount = () => {
+    console.log(`decrement - ${counter}`);
+    // Update state with incremented value
+    setCounter((c) => Math.max(c - 1, 0));
+  };
+  const showProductDetails = (item) => {
+    
+    navigate(`/Product?id=${item.index}`);
   };
 
   return (
     <div>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {items.map((item, i) => (
+        {Products.slice(0, 8).map((item, i) => (
           <Grid item xs={12} sm={6} md={3} key={i}>
             <Card sx={{ maxWidth: 345 }}>
               <CardActionArea>
                 <CardMedia
                   component="img"
                   height="140"
-                  image={item.images[0]}
+                  image={item.image}
                   alt="green iguana"
+                  sx={{ height: "150px", width: "150px" }}
+                  onClick={() => showProductDetails(item)}
                 />
                 <CardContent>
                   <Typography gutterBottom variant="body" component="div">
                     {item.brand}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {item.title}
+                    {item.product}
                   </Typography>
                   <FormControl fullWidth>
                     <Select
@@ -74,31 +99,19 @@ const Home = () => {
                       id={`demo-simple-select-${i}`}
                       value={prices[i]}
                       onChange={(e) => handlePrice(e, i)}
-                      defaultValue={item.price}
+                      defaultValue={item.market_price}
                     >
-                      <MenuItem value={item.price}>
+                      <MenuItem value={item.market_price}>
                         1 pc - Rs.
-                        {item.price -
-                          (
-                            (item.price * item.discountPercentage) /
-                            100
-                          ).toFixed(2)}
+                        {item.sale_price}
                       </MenuItem>
-                      <MenuItem value={2 * item.price}>
+                      <MenuItem value={2 * item.market_price}>
                         2 pcs - Rs.
-                        {(
-                          2 *
-                          (item.price -
-                            (item.price * item.discountPercentage) / 100)
-                        ).toFixed(2)}
+                        {(2 * item.sale_price).toFixed(2)}
                       </MenuItem>
-                      <MenuItem value={5 * item.price}>
+                      <MenuItem value={5 * item.market_price}>
                         5 pcs - Rs.
-                        {(
-                          5 *
-                          (item.price -
-                            (item.price * item.discountPercentage) / 100)
-                        ).toFixed(2)}
+                        {(5 * item.sale_price).toFixed(2)}
                       </MenuItem>
                     </Select>
                   </FormControl>
@@ -128,11 +141,39 @@ const Home = () => {
                     <br></br>
                     <span>9:00AM - 1:30PM</span>
                   </Typography>
-                  <TextField
-                    id="outlined-basic"
-                    label="Outlined"
-                    variant="outlined"
-                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ color: "#FFFE9D" }}
+                  >
+                    ADD
+                  </Button>
+                  <div className="btn-group" role="group">
+                    {" "}
+                    <button
+                      type="button"
+                      className="btn btn-warning"
+                      onClick={decrementCount}
+                    >
+                      {" "}
+                      -{" "}
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      defaultValue={counter}
+                      value={counter}
+                      className="form-control"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-warning"
+                      onClick={incrementCount}
+                    >
+                      {" "}
+                      +{" "}
+                    </button>
+                  </div>
                 </CardContent>
               </CardActionArea>
             </Card>

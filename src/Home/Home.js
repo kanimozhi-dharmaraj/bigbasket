@@ -4,11 +4,14 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import {
+  Box,
   Button,
   CardActionArea,
   FormControl,
+  InputAdornment,
   MenuItem,
   Select,
+  TextField,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Products from "../Products.json";
@@ -67,12 +70,17 @@ const Home = () => {
     setCounter((c) => Math.max(c - 1, 0));
   };
   const showProductDetails = (item) => {
-    
     navigate(`/Product?id=${item.index}`);
   };
 
   return (
     <div>
+      <Box sx={{ overflow: "hidden" }}>
+        <img
+          src="https://www.bigbasket.com/media/uploads/banner_images/2305152-bbpl-staples_460_Bangalore.jpg"
+          alt="banner"
+        />
+      </Box>
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {Products.slice(0, 8).map((item, i) => (
           <Grid item xs={12} sm={6} md={3} key={i}>
@@ -141,13 +149,29 @@ const Home = () => {
                     <br></br>
                     <span>9:00AM - 1:30PM</span>
                   </Typography>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ color: "#FFFE9D" }}
-                  >
-                    ADD
-                  </Button>
+                  {counter === 0 ? (
+                  <div>
+                  <TextField
+                      id="filled-start-adornment"
+                      sx={{ m: 1, width: "10ch" }}
+                    //   InputProps={{
+                    //     startAdornment: (
+                    //       <InputAdornment position="start">Qty</InputAdornment>
+                    //     ),
+                    //   }}
+                      variant="filled"
+                      placeholder="1"
+                    />
+                    <Button
+                      variant="contained"
+                      size="small"
+                      sx={{ color: "#FFFE9D" }}
+                      onClick={incrementCount}
+                    >
+                      ADD
+                    </Button>
+                    </div>
+        ) : (
                   <div className="btn-group" role="group">
                     {" "}
                     <button
@@ -174,7 +198,37 @@ const Home = () => {
                       +{" "}
                     </button>
                   </div>
+                  )}
                 </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
+        <h6>Fruits and Vegetables</h6>
+        {Products.slice(11, 25).map((item, i) => (
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <Card sx={{ maxWidth: 345 }}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={item.image}
+                  alt="green iguana"
+                  sx={{ height: "150px", width: "150px" }}
+                  onClick={() => showProductDetails(item)}
+                />
+                {/* <CardContent>
+                  <Typography gutterBottom variant="body" component="div">
+                    {item.product}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {item.product}
+                  </Typography>
+                 
+                 
+                </CardContent> */}
               </CardActionArea>
             </Card>
           </Grid>

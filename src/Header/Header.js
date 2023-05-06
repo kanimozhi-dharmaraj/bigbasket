@@ -96,12 +96,7 @@ const Header = () => {
         {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}
       </Toolbar>
     </AppBar>
-    <Box sx={{ overflow: "hidden" }}>
-      <img
-        src="https://www.bigbasket.com/media/uploads/banner_images/2305152-bbpl-staples_460_Bangalore.jpg"
-        alt="banner"
-      />
-    </Box>
+   
     
   </Box>
   )

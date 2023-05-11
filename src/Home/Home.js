@@ -16,12 +16,13 @@ import {
 import Grid from "@mui/material/Grid";
 import Products from "../Products.json";
 import { useNavigate } from "react-router-dom";
+import "./Home.css";
 
 const Home = () => {
   //   const [items, setItems] = useState([]);
   const [prices, setPrices] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
-  const [counter, setCounter] = useState(0);
+  const [counters, setCounters] = useState({});
   const navigate = useNavigate();
   //   const getPosts = async () => {
   //     try {
@@ -58,20 +59,27 @@ const Home = () => {
       return newSelectedPrices;
     });
   };
-  const incrementCount = () => {
-    console.log(`increment - ${counter}`);
-    // Update state with incremented value
-    setCounter(counter + 1);
+  const incrementCount = (id) => {
+    setCounters((prevCounters) => {
+      const newCounters = { ...prevCounters };
+      newCounters[id] = (newCounters[id] || 0) + 1;
+      return newCounters;
+    });
   };
 
-  const decrementCount = () => {
-    console.log(`decrement - ${counter}`);
-    // Update state with incremented value
-    setCounter((c) => Math.max(c - 1, 0));
+  const decrementCount = (id) => {
+    setCounters((prevCounters) => {
+      const newCounters = { ...prevCounters };
+      newCounters[id] = Math.max((newCounters[id] || 0) - 1, 0);
+      return newCounters;
+    });
   };
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
+  const goToRelevantPage = (item) =>{
+    navigate(`/Filter?sub_category=${item.sub_category}`);
+  }
 
   return (
     <div>
@@ -80,6 +88,7 @@ const Home = () => {
           src="https://www.bigbasket.com/media/uploads/banner_images/2305152-bbpl-staples_460_Bangalore.jpg"
           alt="banner"
         />
+       
       </Box>
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {Products.slice(0, 8).map((item, i) => (
@@ -94,8 +103,10 @@ const Home = () => {
                   sx={{ height: "150px", width: "150px" }}
                   onClick={() => showProductDetails(item)}
                 />
+                 <img src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
+        alt="veg-icon" ></img>
                 <CardContent>
-                  <Typography gutterBottom variant="body" component="div">
+                  <Typography gutterBottom variant="body" component="div" className="brandName">
                     {item.brand}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -149,65 +160,104 @@ const Home = () => {
                     <br></br>
                     <span>9:00AM - 1:30PM</span>
                   </Typography>
-                  {counter === 0 ? (
-                  <div>
+                  {counters[i] === undefined || 0 ? (
+                <div>
                   <TextField
-                      id="filled-start-adornment"
-                      sx={{ m: 1, width: "10ch" }}
-                    //   InputProps={{
-                    //     startAdornment: (
-                    //       <InputAdornment position="start">Qty</InputAdornment>
-                    //     ),
-                    //   }}
-                      variant="filled"
-                      placeholder="1"
-                    />
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{ color: "#FFFE9D" }}
-                      onClick={incrementCount}
-                    >
-                      ADD
-                    </Button>
-                    </div>
-        ) : (
-                  <div className="btn-group" role="group">
-                    {" "}
-                    <button
-                      type="button"
-                      className="btn btn-warning"
-                      onClick={decrementCount}
-                    >
-                      {" "}
-                      -{" "}
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      defaultValue={counter}
-                      value={counter}
-                      className="form-control"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-warning"
-                      onClick={incrementCount}
-                    >
-                      {" "}
-                      +{" "}
-                    </button>
-                  </div>
-                  )}
+                    id={`quantity-${i}`}
+                    sx={{ m: 1, width: "10ch" }}
+                    variant="filled"
+                    placeholder="1"
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{ color: "#FFFE9D" }}
+                    onClick={() => incrementCount(i)}
+                  >
+                    ADD
+                  </Button>
+                </div>
+              ) : (
+                <div className="btn-group" role="group">
+                  <button
+                    type="button"
+                    className="btn btn-warning"
+                    onClick={() => decrementCount(i)}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    defaultValue={counters[i]}
+                    value={counters[i]}
+                    className="form-control"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-warning"
+                    onClick={() => incrementCount(i)}
+                  >
+                    +
+                  </button>
+                </div>
+              )}
                 </CardContent>
               </CardActionArea>
             </Card>
           </Grid>
         ))}
       </Grid>
+      <h2 style={{textAlign:"center"}}>Fruits and Vegetables</h2>
+      <hr></hr>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        <h6>Fruits and Vegetables</h6>
-        {Products.slice(11, 25).map((item, i) => (
+        
+        {Products.slice(17,21).filter(product => product.category==="Fruits & Vegetables").map((item, i) => (
+          <Grid item xs={12} sm={6} md={3} key={i}>
+            <Card sx={{ maxWidth: 345 }}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="171"
+                  width="229"
+                  image={item.image}
+                  alt="green iguana"
+                  sx={{ height: "150px", width: "150px" }}
+                  onClick={() => goToRelevantPage(item)}
+                />
+               
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <h2 style={{textAlign:"center"}}>Beverages</h2>
+      <hr></hr>
+      <Grid container spacing={{ xs: 2, md: 2 }}>
+        
+        {Products.filter(product => product.category==="Beverages").map((item, i) => (
+          <Grid item xs={12} sm={6} md={2} key={i}>
+            <Card sx={{ maxWidth: 345 }}>
+              <CardActionArea>
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={item.image}
+                  alt="green iguana"
+                  sx={{ height: "150px", width: "150px" }}
+                  onClick={() => goToRelevantPage(item)}
+                />
+               
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <h2 style={{textAlign:"center"}}>Snack Store</h2>
+      <hr></hr>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
+        
+        {Products.slice(22,26).filter(product => product.category==="Snacks & Branded Foods").map((item, i) => (
           <Grid item xs={12} sm={6} md={3} key={i}>
             <Card sx={{ maxWidth: 345 }}>
               <CardActionArea>
@@ -217,18 +267,9 @@ const Home = () => {
                   image={item.image}
                   alt="green iguana"
                   sx={{ height: "150px", width: "150px" }}
-                  onClick={() => showProductDetails(item)}
+                  onClick={() => goToRelevantPage(item)}
                 />
-                {/* <CardContent>
-                  <Typography gutterBottom variant="body" component="div">
-                    {item.product}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.product}
-                  </Typography>
-                 
-                 
-                </CardContent> */}
+               
               </CardActionArea>
             </Card>
           </Grid>

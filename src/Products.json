@@ -271,25 +271,9 @@
     "variable_weight_policy": "",
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/76856a71-77c8-4427-8f2f-36460ac4f20b/hp_bevfrulty-indulg_m_250423_04.jpg"
   },
+ 
   {
     "index": 17,
-    "product": "Pepsi Soft Drink 2.25 L + Slice Thickest Mango Drink 1.2 L",
-    "category": "Beverages",
-    "sub_category": "Energy & Soft Drinks",
-    "brand": "bb Combo",
-    "sale_price": 155,
-    "market_price": 155,
-    "type": "Juices",
-    "rating": null,
-    "description": "Pepsi is the pop that shakes things up! Pepsi is ubiquitous on just about every social occasion. Also known to be a Party Starter.India and mangoes go a long way. A fruit so succulent, so sweet and so desired, that Indians waited impatiently for the seasons to turn and bring them closer to their beloved fruit. Keeping this fascination of mangoes we present you Slice which is a refreshing Mango Drink which celebrates the taste of mangoes! Tropicana's fruit expertise and Slices taste perfection have come together and Slice is now Tropicana Slice.",
-    "benefits": "",
-    "storage_uses": "",
-    "other_product_info": "",
-    "variable_weight_policy": "",
-    "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/76856a71-77c8-4427-8f2f-36460ac4f20b/hp_bevecrick-it_m_250423_06.jpg"
-  },
-  {
-    "index": 18,
     "product": "Apple - Washington 4 pcs + Kiwi - Green 3 pcs + Pomegranate 4 pcs",
     "category": "Fruits & Vegetables",
     "sub_category": "Fresh Fruits",
@@ -306,7 +290,7 @@
     "image": "https://www.bigbasket.com/media/uploads/p/s/40033819_29-fresho-apple-shimla.jpg"
   },
   {
-    "index": 19,
+    "index": 18,
     "product": "Apple Shimla 4 pcs + Banana Robusta 1 kg + Watermelon Small + Papaya Medium 1 pc",
     "category": "Fruits & Vegetables",
     "sub_category": "Fresh Fruits",
@@ -323,7 +307,7 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/673f538f-d731-425b-953b-b774f94fa4e7/hp_fresh-fruits-fnv_Storefront_m_250423_02.jpg"
   },
   {
-    "index": 20,
+    "index": 19,
     "product": "Boiled Sweet Corn Kernel - Spice Up With Cheese And Herbs Seasoning",
     "category": "Fruits & Vegetables",
     "sub_category": "Cuts & Sprouts",
@@ -337,10 +321,10 @@
     "storage_uses": "",
     "other_product_info": "",
     "variable_weight_policy": "",
-    "image": ""
+    "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/673f538f-d731-425b-953b-b774f94fa4e7/hp_fnv_Storefront_m_250422_04.jpg"
   },
   {
-    "index": 21,
+    "index": 20,
     "product": "Ladies Finger + Beans French Ring + Carrot Local + Capsicum Green (500 g each)",
     "category": "Fruits & Vegetables",
     "sub_category": "Fresh Vegetables",
@@ -357,7 +341,7 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/673f538f-d731-425b-953b-b774f94fa4e7/hp_fresh-vegetables-fnv_Storefront_m_250423_01.jpg"
   },
   {
-    "index": 22,
+    "index": 21,
     "product": "Tender Coconut - Medium",
     "category": "Fruits & Vegetables",
     "sub_category": "Fresh Fruits",
@@ -374,7 +358,7 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/673f538f-d731-425b-953b-b774f94fa4e7/hp_cuts-sprouts-fnv_Storefront_m_250423_04%20-s.jpg"
   },
   {
-    "index": 23,
+    "index": 22,
     "product": "Tomato - Hybrid 1kg + Onion 1kg + Potato 1kg (Organically Grown)",
     "category": "Fruits & Vegetables",
     "sub_category": "Organic Fruits & Vegetables",
@@ -391,9 +375,9 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/673f538f-d731-425b-953b-b774f94fa4e7/hp_fresh-vegetables-fnv_Storefront_m_250423_01.jpgg"
   },
   {
-    "index": 24,
+    "index": 23,
     "product": "Cereal - Blueberry Morning",
-    "category": "Gourmet & World Food",
+    "category": "Snacks & Branded Foods",
     "sub_category": "Cereals & Breakfast",
     "brand": "Post Selects",
     "sale_price": 525,
@@ -408,9 +392,9 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/eb40461d-88a6-4efe-aaa3-894c42752097/hp_Daily-morning-starters_m_480_250423_02.jpg"
   },
   {
-    "index": 25,
+    "index": 24,
     "product": "Alphanso Mango Ice Cream",
-    "category": "Gourmet & World Food",
+    "category": "Snacks & Branded Foods",
     "sub_category": "Dairy & Cheese",
     "brand": "Baskin Robbins",
     "sale_price": 436.5,
@@ -425,7 +409,7 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/eb40461d-88a6-4efe-aaa3-894c42752097/hp_Daily-sweet-craving_m_480_250423_04.jpg"
   },
   {
-    "index": 26,
+    "index": 25,
     "product": "Good Day Cookies - Chocochip",
     "category": "Snacks & Branded Foods",
     "sub_category": "Biscuits & Cookies",
@@ -442,7 +426,7 @@
     "image": "https://www.bigbasket.com/media/customPage/77880b23-0233-4fad-b54a-a93c998e0d20/f8f26f59-928c-4cd7-9c14-098f03d4866a/eb40461d-88a6-4efe-aaa3-894c42752097/hp_Daily-chai-time_m_480_250423_01.jpg"
   },
   {
-    "index": 27,
+    "index": 26,
     "product": "YiPPee Mood Masala Noodles - Family Pack",
     "category": "Snacks & Branded Foods",
     "sub_category": "Noodle, Pasta, Vermicelli",

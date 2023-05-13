@@ -4,9 +4,14 @@
     min-height: 54px;
     border-radius: 0.3rem;
     overflow: hidden;
-    min-height: 5rem;
+    min-height: 3rem;
     border: 1px solid #d0d0d0;
-    display: flex
+    display: flex;
+    margin : 8px;
+    
+}
+.optionBox:hover{
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.2);
 }
 .weight{
     width: 27%;
@@ -38,5 +43,11 @@
 }
 .clickedWeight{
     background: rgba(132,194,37,.2);
-    
+    border : none;
+}
+.clickedWeight .selectOption{
+    background: url(data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='13'%3E%3Cpath fill='%23FFF' fill-rule='evenodd' d='M15.904.785l-.092-.091a.322.322 0 00-.456.002L4.646 11.493a.162.162 0 01-.231-.003L.653 7.493a.323.323 0 00-.457-.014l-.094.089a.325.325 0 00-.014.457L4.27 12.47a.323.323 0 00.465.006L15.906 1.243a.325.325 0 00-.002-.458'/%3E%3C/svg%3E) no-repeat 50%;
+    background-color: #9cc63d;
+    border-radius: 0 3px 3px 0;
+    margin: -1px -1px -1px 0
 }

@@ -12,7 +12,7 @@ const Product = () => {
   const [params] = useSearchParams();
   const [product, setProduct] = useState(null);
   const [counter, setCounter] = useState(0);
-  const [clickedElement,setClickedElement] = useState();
+  const [clickedElement,setClickedElement] = useState(null);
 
   useEffect(() => {
     setProduct(
@@ -27,8 +27,7 @@ const Product = () => {
     setCounter(() => Math.max(counter - 1, 0));
   };
   const handleClickedWeight = (e) =>{
-    const clickedWeight = e.target.getAttribute("data-value");
-    console.log(clickedWeight)
+    const clickedWeight = e.target.closest("[data-value]").getAttribute("data-value");
     setClickedElement(clickedWeight);
   }
   return (
@@ -128,22 +127,26 @@ const Product = () => {
                     </div>
                   )}
                 <div>
-                  <div className={`optionBox ${clickedElement === '500g' ? 'clickedWeight' : ''}`} data-value="500g" onClick={(e)=>handleClickedWeight(e)}>
-                    <div className="weight">
-                      <div>500g</div>
-                    </div>
-                    <div className="rate">
-                      <div>
-                        <span> Rs.{product.sale_price}</span>
-                        <span style={{ textDecoration: "line-through" }}>
-                          Rs. {product.market_price}
-                        </span>
-                        <span>Discount</span>
+                  {(product.units && product.units.length > 0) ? (
+                    (product.units.map((item, i) => (
+                      <div className={`optionBox ${clickedElement === item.unit ? 'clickedWeight' : ''}`} data-value={item.unit} onClick={(e)=>handleClickedWeight(e)}>
+                        <div className="weight">
+                          <div>{item.unit}</div>
+                        </div>
+                        <div className="rate">
+                          <div>
+                            <span> Rs.{product.sale_price * item.multiple}</span>
+                            <span style={{ textDecoration: "line-through" }}>
+                              Rs. {product.market_price * item.multiple}
+                            </span>
+                            <span>Discount</span>
+                          </div>
+                        </div>
+                        <div className="selectOption"></div>
                       </div>
-                    </div>
-                    <div className="selectOption"></div>
-                  </div>
-                  <div className={`optionBox ${clickedElement === '1kg' ? 'clickedWeight' : ''}`} data-value="1kg" onClick={(e)=>handleClickedWeight(e)}>
+                      )))
+                  ) : ""}
+                  {/* <div className={`optionBox ${clickedElement === '1kg' ? 'clickedWeight' : ''}`} data-value="1kg" onClick={(e)=>handleClickedWeight(e)}>
                     <div className="weight">
                       <div>1kg</div>
                     </div>
@@ -172,7 +175,7 @@ const Product = () => {
                       </div>
                     </div>
                     <div className="selectOption"></div>
-                  </div>
+                  </div> */}
                 </div>
               </>
             )}

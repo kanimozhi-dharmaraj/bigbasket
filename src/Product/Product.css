@@ -1,0 +1,42 @@
+.optionBox{
+    cursor: pointer;
+    font-size: .8rem;
+    min-height: 54px;
+    border-radius: 0.3rem;
+    overflow: hidden;
+    min-height: 5rem;
+    border: 1px solid #d0d0d0;
+    display: flex
+}
+.weight{
+    width: 27%;
+    margin: 1rem 0 1rem 1rem;
+    flex-grow: 0;
+    padding-right: 1%;
+}
+.rate{
+    flex-grow: 1;
+    margin: 1rem 0;
+}
+.rate span{
+    margin-left: 1rem
+}
+.selectOption{
+    width: 3.6rem;
+    flex-shrink: 0;
+    align-self: stretch;
+    background: 
+    url(data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12'%3E%3Cpath fill='%238F8F8F' fill-rule='evenodd' d='M15.904.185l-.092-.091a.322.322 0 00-.457.002L4.647 10.893a.162.162 0 01-.232-.003L.653 6.893a.323.323 0 00-.457-.014l-.095.089a.325.325 0 00-.014.457L4.27 11.87a.323.323 0 00.465.006L15.906.643a.325.325 0 00-.002-.458'/%3E%3C/svg%3E)
+     no-repeat 50%
+}
+.saveBtn{
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.2);
+    position: relative;
+    background: #fff;
+    margin: 0 5px;
+    padding: 11px 30px
+}
+.clickedWeight{
+    background: rgba(132,194,37,.2);
+    
+}

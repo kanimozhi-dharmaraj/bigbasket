@@ -8,7 +8,6 @@ import {
   Button,
   CardActionArea,
   FormControl,
-  InputAdornment,
   MenuItem,
   Select,
   TextField,
@@ -109,7 +108,7 @@ const Home = () => {
                   <Typography gutterBottom variant="body" component="div" className="brandName">
                     {item.brand}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" className="productName" onClick={() => showProductDetails(item)}>
                     {item.product}
                   </Typography>
                   <FormControl fullWidth>
@@ -119,6 +118,7 @@ const Home = () => {
                       value={prices[i]}
                       onChange={(e) => handlePrice(e, i)}
                       defaultValue={item.market_price}
+                      className="dropDownBox"
                     >
                       <MenuItem value={item.market_price}>
                         1 pc - Rs.
@@ -142,23 +142,19 @@ const Home = () => {
                     Rs.{selectedPrices[i]}
                   </Typography>
                   <Typography
-                    sx={{
-                      fontSize: "10px",
-                      color: "#333",
-                      fontFamily: "ProximaNovaA-Regular",
-                      marginBottom: "2px",
-                      lineHeight: "15px",
-                    }}
+                   className="DeliveryDetail"
                   >
+                 
+                
                     <img
                       src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
-                      width="30px"
-                      height="25px"
+                      className="transport"
                       alt="transport"
                     ></img>
-                    <span>Standard Delivery: Tomorrow</span>
+            
+                    <p className="deliveryTime"><span>Standard Delivery: Tomorrow</span>
                     <br></br>
-                    <span>9:00AM - 1:30PM</span>
+                <span>9:00AM - 1:30PM</span></p>
                   </Typography>
                   {counters[i] === undefined || 0 ? (
                 <div>

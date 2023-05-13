@@ -3,3 +3,52 @@
     color: #999;
     font: 11px ProximaNovaA-Regular;
 }
+.productName{
+    color: #000;
+    font: 13px ProximaNovaA-Regular;
+}
+.productName:hover{
+    color: lightgreen;
+}
+.dropDownBox{
+    padding: 0 0 0 8px;
+    border-radius: 0;
+    line-height: 20px;
+    text-align: left;
+    background-color: #fff;
+    box-shadow: none;
+    width: 100%;
+    font-size: 12px;
+    font-family: ProximaNovaA-Semibold;
+    height: 22px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #666;
+}
+.dropDownBox MenuItem{
+    font: 10px ProximaNovaA-Semibold;
+    border-bottom-color: #004c72;
+    color: #59595b;
+    border-left: 5px solid #fff;
+    padding-left: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.deliveryDetail{
+
+}
+.transport{
+    background-repeat: no-repeat;
+    background-size: 24px;
+    width: 30px;
+    height: 25px;
+}
+.deliveryTime p{
+    font-size: 10px;
+    color: #333;
+    font-family: ProximaNovaA-Regular;
+    margin-bottom: 2px;
+    line-height: 15px;
+}

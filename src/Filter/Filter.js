@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Products from "../Products.json";
 import Card from "@mui/material/Card";
@@ -6,7 +6,6 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import {
-  Box,
   Button,
   CardActionArea,
   Checkbox,
@@ -24,7 +23,7 @@ const Filter = () => {
   const [counters, setCounters] = useState({});
 
   const [params] = useSearchParams();
-  const [product, setProduct] = useState();
+  
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -192,12 +191,13 @@ const Filter = () => {
                       </Typography>
                       {counters[i] === undefined || 0 ? (
                         <div>
-                          <TextField
-                            id={`quantity-${i}`}
-                            sx={{ m: 1, width: "10ch" }}
-                            variant="filled"
-                            placeholder="1"
-                          />
+                           <TextField
+                    id={`quantity-${i}`}
+                    sx={{ m: 1, width: "10ch" }}
+                    variant="filled"
+                    placeholder="1"
+                   
+                  />
                           <Button
                             variant="contained"
                             size="small"

@@ -5,20 +5,39 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { Button, TextField, Typography } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import "./Product.css";
 
 const Product = () => {
   const [params] = useSearchParams();
   const [product, setProduct] = useState(null);
   const [counter, setCounter] = useState(0);
-  const [clickedElement,setClickedElement] = useState(null);
+  const [clickedElement, setClickedElement] = useState(null);
+  const [marketPrice, setMarketPrice] = useState();
+  const [salePrice, setSalePrice] = useState();
+  const [discountPercentage, setDiscountPercentage] = useState(0);
 
   useEffect(() => {
     setProduct(
       Products.find((item) => item.index === parseInt(params.get("id")))
     );
   }, [params]);
+  useEffect(() => {
+    if (product && product.units && product.units.length > 0) {
+      const minQuantity = product.units[0].unit;
+      const minMarketPrice = product.market_price;
+      const minSalePrice = product.sale_price;
+      setClickedElement(minQuantity);
+      setMarketPrice(minMarketPrice);
+      setSalePrice(minSalePrice);
+    }
+  }, [product]);
+  useEffect(() => {
+    if (marketPrice && salePrice) {
+      const percentage = ((marketPrice - salePrice) / marketPrice) * 100;
+      setDiscountPercentage(Math.round(percentage));
+    }
+  }, [marketPrice, salePrice]);
   const incrementCount = () => {
     setCounter(counter + 1);
   };
@@ -26,10 +45,24 @@ const Product = () => {
   const decrementCount = () => {
     setCounter(() => Math.max(counter - 1, 0));
   };
-  const handleClickedWeight = (e) =>{
-    const clickedWeight = e.target.closest("[data-value]").getAttribute("data-value");
+  const handleClickedWeight = (e) => {
+    const clickedWeight = e.target
+      .closest("[data-value]")
+      .getAttribute("data-value");
+    const clickedMarketPrice = e.target
+      .closest("[data-value]")
+      .getAttribute("data-market-price");
+    console.log(clickedMarketPrice);
+    const clickedSalePrice = e.target
+      .closest("[data-value]")
+      .getAttribute("data-sale-price");
+    console.log(clickedSalePrice);
+    // console.log(e.target.value)
     setClickedElement(clickedWeight);
-  }
+
+    setMarketPrice(clickedMarketPrice);
+    setSalePrice(clickedSalePrice);
+  };
   return (
     <>
       <Card>
@@ -45,21 +78,77 @@ const Product = () => {
           <CardContent sx={{ flex: "1 0 auto" }}>
             {product && (
               <>
-                <Typography gutterBottom variant="body" component="div">
+                <Typography
+                  gutterBottom
+                  variant="body"
+                  component="div"
+                  className="brandName"
+                >
                   {product.brand}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {product.brand} {product.product} - 1pc
-                </Typography>
+                <h1 className="title">
+                  {product.brand} {product.product} - {clickedElement}
+                </h1>
                 <Typography>
-                  MRP{" "}
-                  <span style={{ textDecoration: "line-through" }}>
-                    Rs. {product.market_price}
-                  </span>{" "}
-                  Rs.{product.sale_price}
+                  <div
+                    style={{ textDecoration: "line-through" }}
+                    className="mrpStyle"
+                  >
+                    MRP Rs. {marketPrice}
+                  </div>{" "}
+                  <div className="spStyle"> Price : Rs.{salePrice}</div>
                 </Typography>
-                <Typography>Your Save :</Typography>
-                <Typography>(Inclusive of all taxes)</Typography>
+                <div className="dpStyle">
+                  Your Save : {discountPercentage} %
+                </div>
+                <div className="info">(Inclusive of all taxes)</div>
+
+                {counter === 0 ? (
+                  <div>
+                    <TextField
+                      sx={{
+                        width: "40px",
+                        border: "1px solid #c8c8c8",
+                        borderRadius: "3px",
+                        textAlign: "center",
+                        color: "#666",
+                        height: "40px",
+                      }}
+                      placeholder="1"
+                    />
+                    <button
+                      className="basketBtn"
+                      onClick={() => incrementCount()}
+                    >
+                      ADD TO BASKET
+                    </button>
+                    <button className="saveBtn">Save</button>
+                  </div>
+                ) : (
+                  <div className="btn-group" role="group">
+                    <button
+                      type="button"
+                      className="btn btn-warning"
+                      onClick={() => decrementCount()}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      defaultValue={counter}
+                      value={counter}
+                      className="form-control"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-warning"
+                      onClick={() => incrementCount()}
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
                 <Typography
                   sx={{
                     fontSize: "10px",
@@ -70,82 +159,54 @@ const Product = () => {
                   }}
                 >
                   <img
-                    src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
-                    width="30px"
-                    height="25px"
+                    src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='12'%3E%3Cg fill='%238F8F8F' fill-rule='evenodd'%3E%3Cpath d='M16.369 6.024h-2.044c-.11 0-.198-.072-.198-.161V4.97c0-.09.089-.161.198-.161h1.432a.21.21 0 01.174.083l.611.892c.074.107-.022.239-.173.239m1.358.165l-1.273-1.857a.42.42 0 00-.346-.165H13.73c-.219 0-.397.144-.397.321v1.857c0 .178.178.322.397.322h3.65c.303 0 .494-.264.347-.478'/%3E%3Cpath d='M18.8 9.11c0 .097-.086.175-.19.175h-.71a.189.189 0 01-.183-.13c-.251-.817-1.07-1.418-2.039-1.418-.968 0-1.787.6-2.038 1.418a.189.189 0 01-.183.13h-.937c-.104 0-.189-.078-.189-.174V3.189c0-.096.085-.174.19-.174h3.98c.068 0 .13.034.164.088l2.11 3.451a.163.163 0 01.024.085v2.472zm-3.122 1.826c-.752 0-1.361-.56-1.361-1.251 0-.692.61-1.252 1.361-1.252.753 0 1.362.56 1.362 1.252 0 .69-.61 1.251-1.362 1.251zm-4.18-1.825c0 .096-.084.174-.188.174H5.52a.19.19 0 01-.182-.127c-.263-.8-1.072-1.386-2.028-1.386s-1.766.585-2.028 1.386a.19.19 0 01-.182.127h-.08c-.104 0-.189-.078-.189-.174V.939c0-.096.085-.174.19-.174H11.31c.104 0 .189.078.189.174V9.11zM3.31 10.97c-.752 0-1.362-.56-1.362-1.252 0-.691.61-1.252 1.362-1.252.752 0 1.361.56 1.361 1.252s-.61 1.252-1.361 1.252zm16.197-4.639l-2.345-3.835a.385.385 0 00-.33-.178H12.52c-.104 0-.189-.078-.189-.174V.348c0-.192-.17-.348-.378-.348H.378C.17 0 0 .156 0 .348v9.354c0 .192.17.348.378.348h.69c.09 0 .164.056.185.135.228.85 1.063 1.482 2.057 1.482.993 0 1.828-.632 2.056-1.482a.188.188 0 01.184-.135h7.897c.087 0 .162.055.184.132.24.833 1.066 1.45 2.047 1.45.981 0 1.808-.617 2.048-1.45a.188.188 0 01.184-.132h1.267c.21 0 .379-.156.379-.348v-3.2a.326.326 0 00-.049-.17z'/%3E%3C/g%3E%3C/svg%3E"
+                    height="20px"
+                    width="25px"
                     alt="transport"
                   ></img>
-                  <span>Standard Delivery: Tomorrow 9:00AM - 1:30PM</span>
+                  <span className="deliveryTime">Standard Delivery: Tomorrow 9:00AM - 1:30PM</span>
                 </Typography>
-                {counter === 0 ? (
-                    <div>
-                      <TextField
-                        id="quantity"
-                        sx={{ m: 1, width: "10ch" }}
-                        variant="filled"
-                        placeholder="1"
-                      />
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{ color: "#FFFE9D" }}
-                        onClick={() => incrementCount()}
-                      >
-                        ADD
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        className="saveBtn"
-                      >
-                        Save
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="btn-group" role="group">
-                      <button
-                        type="button"
-                        className="btn btn-warning"
-                        onClick={() => decrementCount()}
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        defaultValue={counter}
-                        value={counter}
-                        className="form-control"
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-warning"
-                        onClick={() => incrementCount()}
-                      >
-                        +
-                      </button>
-                    </div>
-                  )}
                 <div>
-                  {(product.units && product.units.length > 0) ? (
-                    (product.units.map((item, i) => (
-                      <div className={`optionBox ${clickedElement === item.unit ? 'clickedWeight' : ''}`} data-value={item.unit} onClick={(e)=>handleClickedWeight(e)}>
-                        <div className="weight">
-                          <div>{item.unit}</div>
-                        </div>
-                        <div className="rate">
-                          <div>
-                            <span> Rs.{product.sale_price * item.multiple}</span>
-                            <span style={{ textDecoration: "line-through" }}>
-                              Rs. {product.market_price * item.multiple}
-                            </span>
-                            <span>Discount</span>
+                  {product.units && product.units.length > 0
+                    ? product.units.map((item, i) => (
+                        <div
+                          className={`optionBox ${
+                            clickedElement === item.unit ? "clickedWeight" : ""
+                          }`}
+                          data-value={item.unit}
+                          data-sale-price={(
+                            product.sale_price * item.multiple
+                          ).toFixed(2)}
+                          data-market-price={(
+                            product.market_price * item.multiple
+                          ).toFixed(2)}
+                          onClick={(e) => handleClickedWeight(e)}
+                        >
+                          <div className="weight">
+                            <div>{item.unit}</div>
                           </div>
+                          <div className="rate">
+                            <div>
+                              <span>
+                                {" "}
+                                Rs.
+                                {(product.sale_price * item.multiple).toFixed(
+                                  2
+                                )}
+                              </span>
+                              <span style={{ textDecoration: "line-through" }}>
+                                Rs.{" "}
+                                {(product.market_price * item.multiple).toFixed(
+                                  2
+                                )}
+                              </span>
+                              <span>{discountPercentage} %</span>
+                            </div>
+                          </div>
+                          <div className="selectOption"></div>
                         </div>
-                        <div className="selectOption"></div>
-                      </div>
-                      )))
-                  ) : ""}
+                      ))
+                    : ""}
                   {/* <div className={`optionBox ${clickedElement === '1kg' ? 'clickedWeight' : ''}`} data-value="1kg" onClick={(e)=>handleClickedWeight(e)}>
                     <div className="weight">
                       <div>1kg</div>

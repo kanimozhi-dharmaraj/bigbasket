@@ -1,3 +1,61 @@
+.brandName{
+    font-family: ProximaNova-Semibold;
+    font-size: 0.8rem;
+    color: #666;
+    border-bottom: 1px solid #666;
+    width: 36px;
+}
+.title{
+    font-size: 1.5rem;
+    color: #222;
+    padding-top: 0.6rem;
+    font-weight: 400;
+    margin: 0 0 10px;
+   
+}
+.mrpStyle{
+    font-size: 0.8rem;
+    color: #8f8f8f;
+}
+.spStyle{
+    color: #222;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+.dpStyle{
+    color: #ba5252;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.info{
+    font-size: 0.8rem;
+    color: #8f8f8f;
+}
+
+.basketBtn{
+    cursor: pointer;
+    margin: 0 5px;
+    background: #84c225;
+    color: #fff;
+    border: 1px solid #84c225;
+    border-radius: 3px;
+    padding: 11px 30px;
+
+}
+.saveBtn{
+    color: #666;
+    border: 1px solid #979797;
+    border-radius: 3px;
+    position:relative;
+    margin: 0 5px;
+    padding: 11px 30px;
+    cursor: pointer;
+}
+.deliveryTime{
+    color: #979797;
+    font-size : 0.8rem;
+    padding: 10px
+}
 .optionBox{
     cursor: pointer;
     font-size: .8rem;

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Products from "../Products.json";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
+import "./Filter.css";
 import {
   Button,
   CardActionArea,
@@ -21,7 +22,9 @@ const Filter = () => {
   const [prices, setPrices] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
-
+  const [brands,setBrands] = useState([]);
+  const [filterPrices,setFilterPrices] =useState([]);
+  const [filteredProducts,setFilteredProducts] = useState([]);
   const [params] = useSearchParams();
   
   const navigate = useNavigate();
@@ -31,10 +34,10 @@ const Filter = () => {
   //       Products.find((item) => item.sub_category === (params.get("sub_category")))
   //     );
   //   }, [params]);
-  console.log(params.get("sub_category"));
-  console.log(
-    Products.filter((item) => item.sub_category === params.get("sub_category"))
-  );
+  // console.log(params.get("sub_category"));
+  // console.log(
+  //   Products.filter((item) => item.sub_category === params.get("sub_category"))
+  // );
   const handlePrice = (e, index) => {
     const itemPrice = e.target.value;
     setPrices((prevPrices) => {
@@ -67,26 +70,125 @@ const Filter = () => {
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
+  const allBrands = [...new Set(Products.map((item) => item.brand))];
+  const applyBrand = (e)=>{
+     console.log(e.target.checked);
+     console.log(e.target.value);
+     const {value,checked} = e.target;
+     if(checked && !brands.includes(value)){
+      setBrands((prevBrands) => [...prevBrands, value]);
+     }
+     else if(!checked && brands.includes(value)){
+      const brand = brands.filter((item)=> item !== value);
+      setBrands(brand);
+     }
+  }
+  const applyPrice = (e)=>{
+    const {value,checked} = e.target;
+
+    if(checked && !filterPrices.includes(value)){
+     setFilterPrices((prevfilterPrices) => [...prevfilterPrices, value]);
+    }
+    else if(!checked && filterPrices.includes(value)){
+     const updatedFilterPrices = filterPrices.filter((item)=> item !== value);
+     setFilterPrices(updatedFilterPrices);
+    }
+ }
+
+ function applyPriceFilters(selectedFilters) {
+  const filteredProducts = [];
+  const filterOptions = {
+    "pf-1": { "operation": 'lt', "prices" : [20] },
+    "pf-2": { "operation": 'between', "prices" : [21, 50] },
+    "pf-3": { "operation": 'between', "prices" : [51, 100] },
+    "pf-4": { "operation": 'between', "prices" : [101, 200] },
+    "pf-5": { "operation": 'between', "prices" : [201, 500] },
+    "pf-6": { "operation": 'gt', "prices" : [500] },
+  };
+
+  // Iterate over selected filter keys
+  for (const key of selectedFilters) {
+    const filter = filterOptions[key];
+
+    // Check the operation value
+    switch (filter.operation) {
+      case 'lt': {
+        // Filter products with price less than the specified value
+        const [maxPrice] = filter.prices;
+        const filtered = Products.filter(product => product.sale_price < maxPrice);
+        filteredProducts.push(...filtered);
+        break;
+      }
+      case 'between': {
+        // Filter products with price between the specified range
+        const [minPrice, maxPrice] = filter.prices;
+        console.log(filter.prices);
+        const filtered = Products.filter(product => product.sale_price >= minPrice && product.sale_price <= maxPrice);
+        filteredProducts.push(...filtered);
+        break;
+      }
+      case 'gt': {
+        // Filter products with price greater than the specified value
+        const [minPrice] = filter.prices;
+        const filtered = Products.filter(product => product.sale_price > minPrice);
+        filteredProducts.push(...filtered);
+        break;
+      }
+      default:
+        // Invalid operation
+        break;
+    }
+  }
+
+  return filteredProducts;
+}
+
+useEffect(() => {
+  const filteredProducts = applyPriceFilters(filterPrices);
+  setFilteredProducts(filteredProducts);
+}, [filterPrices]);
+useEffect(() => {
+  const initialFilteredProducts = Products.filter(
+    (item) => item.sub_category === params.get("sub_category")
+  );
+  setFilteredProducts(initialFilteredProducts);
+}, [params]);
+
+
+
+
+
   return (
     <>
       <div style={{ display: "flex" }}>
         <div>
-          <div>
+          <div className="scrollable-container">
             <h2>Brand</h2>
+            
             <FormGroup>
-              <FormControlLabel control={<Checkbox />} label="Fresho" />
-              <FormControlLabel control={<Checkbox />} label="Organic" />
-            </FormGroup>
+          {allBrands.map((brand) => (
+            <FormControlLabel
+              key={brand}
+              control={<Checkbox />}
+              label={brand}
+              onChange={applyBrand}
+              value={brand}
+              name="brands"
+              
+            />
+          ))}
+        </FormGroup>
+        
           </div>
           <div>
             <h2>Price</h2>
             <FormGroup>
-              <FormControlLabel control={<Checkbox />} label="Less than Rs 20" />
-              <FormControlLabel control={<Checkbox />} label="Rs 21 to Rs 50" />
-              <FormControlLabel control={<Checkbox />} label="Rs 51 to Rs 100" />
-              <FormControlLabel control={<Checkbox />} label="Rs 101 to Rs 200" />
-              <FormControlLabel control={<Checkbox />} label=" 201 to Rs 500" />
-              <FormControlLabel control={<Checkbox />} label="More than Rs 501" />
+              <FormControlLabel control={<Checkbox />} label="Less than Rs 20" onChange={e=>applyPrice(e)} value="pf-1" name="price" />
+              <FormControlLabel control={<Checkbox />} label="Rs 21 to Rs 50" onChange={e=>applyPrice(e)} value="pf-2" name="price" />
+              <FormControlLabel control={<Checkbox />} label="Rs 51 to Rs 100" onChange={e=>applyPrice(e)} value="pf-3" name="price" />
+              <FormControlLabel control={<Checkbox />} label="Rs 101 to Rs 200" onChange={e=>applyPrice(e)} value="pf-4" name="price" />
+              <FormControlLabel control={<Checkbox />} label=" 201 to Rs 500" onChange={e=>applyPrice(e)} value="pf-5" name="price" />
+              <FormControlLabel control={<Checkbox />} label="More than Rs 501" onChange={e=>applyPrice(e)} value="pf-6" name="price" />
             </FormGroup>
           </div>
           <div>
@@ -111,9 +213,23 @@ const Filter = () => {
           </h2>
           <hr></hr>
           <Grid container spacing={{ xs: 2, md: 3 }}>
-            {Products.filter(
-              (item) => item.sub_category === params.get("sub_category")
-            ).map((item, i) => (
+          {filteredProducts
+        .filter((item) => {
+          if (brands.length > 0 && filterPrices.length > 0) {
+            return (
+              item.sub_category === params.get("sub_category") &&
+              brands.includes(item.brand) &&
+              filterPrices.some((filter) => {
+                const [minPrice, maxPrice] = filter.prices;
+                return (
+                  item.sale_price >= minPrice && item.sale_price <= maxPrice
+                );
+              })
+            );
+          }
+          return item.sub_category === params.get("sub_category");
+        })
+        .map((item, i) => (
               <Grid item xs={12} sm={6} md={3} key={i}>
                 <Card sx={{ maxWidth: 300 }}>
                   <CardActionArea>

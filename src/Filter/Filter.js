@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import Products from "../Products.json";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -27,13 +27,13 @@ const Filter = () => {
   const [prices, setPrices] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
-  const [brands, setBrands] = useState([]);
-  const [filterPrices, setFilterPrices] = useState([]);
+  const [brandFilters, setBrandFilters] = useState([]);
+  const [discountFilters, setDiscountFilters] = useState([]);
+  const [priceFilters, setPriceFilters] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [params] = useSearchParams();
-  const [discountPrices, setDiscountPrices] = useState([]);
-  const [discountedProducts, setDiscountedProducts] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // useEffect(() => {
   //     setProduct(
@@ -117,29 +117,7 @@ const Filter = () => {
   }));
 
   const allBrands = [...new Set(Products.map((item) => item.brand))];
-  const applyBrand = (e) => {
-    console.log(e.target.checked);
-    console.log(e.target.value);
-    const { value, checked } = e.target;
-    if (checked && !brands.includes(value)) {
-      setBrands((prevBrands) => [...prevBrands, value]);
-    } else if (!checked && brands.includes(value)) {
-      const brand = brands.filter((item) => item !== value);
-      setBrands(brand);
-    }
-  };
-  const applyPrice = (e) => {
-    const { value, checked } = e.target;
-
-    if (checked && !filterPrices.includes(value)) {
-      setFilterPrices((prevfilterPrices) => [...prevfilterPrices, value]);
-    } else if (!checked && filterPrices.includes(value)) {
-      const updatedFilterPrices = filterPrices.filter((item) => item !== value);
-      setFilterPrices(updatedFilterPrices);
-    }
-  };
-
-  function applyPriceFilters(products, selectedFilters) {
+  function applyPriceFilters(products, priceFilters) {
     const filteredProducts = [];
     const filterOptions = {
       "pf-1": { operation: "lt", prices: [20] },
@@ -151,7 +129,7 @@ const Filter = () => {
     };
 
     // Iterate over selected filter keys
-    for (const key of selectedFilters) {
+    for (const key of priceFilters) {
       const filter = filterOptions[key];
 
       // Check the operation value
@@ -189,18 +167,6 @@ const Filter = () => {
 
     return filteredProducts;
   }
-  const applyDiscount = (e) => {
-    const { value, checked } = e.target;
-
-    if (checked && !discountPrices.includes(value)) {
-      setDiscountPrices((prevdiscountPrices) => [...prevdiscountPrices, value]);
-    } else if (!checked && discountPrices.includes(value)) {
-      const updatedDiscountPrices = discountPrices.filter(
-        (item) => item !== value
-      );
-      setDiscountPrices(updatedDiscountPrices);
-    }
-  };
 
   function applyDiscountFilters(products, selectedFilters) {
     const discountedProducts = [];
@@ -267,9 +233,29 @@ const Filter = () => {
     return discountedProducts;
   }
 
+  const trackChanges = (e)=>{
+     const {name,checked ,value} = e.target;
+     console.log({name,checked ,value})
+     let searchString = location.search.substring(1);
+     let searchParams = searchString ? searchString.split("&") : [];
+     if(name === "brands") {
+      (checked === true) ? searchParams.push(`brands=${value}`) : searchParams = searchParams.filter(e => e != `brands=${value}`);
+     }
+     if(name === "prices") {
+      (checked === true) ? searchParams.push(`prices=${value}`) : searchParams = searchParams.filter(e => e != `prices=${value}`);
+     }
+     if(name === "discounts") {
+      (checked === true) ? searchParams.push(`discounts=${value}`) : searchParams = searchParams.filter(e => e != `discounts=${value}`);
+     }
+     navigate(`/Filter?${searchParams.join('&')}`);
+  }
+
   useEffect(() => {
     let productsAfterFiltered = Products;
-    if(params.get("sub_category")) {
+    const searchString = location.search.substring(1);
+    const params = new URLSearchParams(searchString);
+  
+    if (params.get("sub_category")) {
       productsAfterFiltered = Products.filter(
         (item) => item.sub_category === params.get("sub_category")
       );
@@ -279,17 +265,21 @@ const Filter = () => {
       productsAfterFiltered = productsAfterFiltered.filter((item) =>
         brandValues.includes(item.brand)
       );
+      setBrandFilters(brandValues);
     }
     if (params.get("prices")) {
       const prices = params.getAll("prices");
       productsAfterFiltered = applyPriceFilters(productsAfterFiltered, prices);
+      setPriceFilters(prices)
     }
     if (params.get("discounts")) {
       const discounts = params.getAll("discounts");
       productsAfterFiltered = applyDiscountFilters(productsAfterFiltered, discounts);
-    }
+      setDiscountFilters(discounts)
+    } 
     setFilteredProducts(productsAfterFiltered);
-  },[])
+  }, [location.search]);
+  
 
   return (
     <>
@@ -314,7 +304,8 @@ const Filter = () => {
                     key={brand}
                     control={<Checkbox />}
                     label={brand}
-                    onChange={applyBrand}
+                    onChange={trackChanges}
+                    checked={brandFilters.includes(brand)}
                     value={brand}
                     name="brands"
                   />
@@ -328,44 +319,50 @@ const Filter = () => {
               <FormControlLabel
                 control={<Checkbox />}
                 label="Less than Rs 20"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-1")}
                 value="pf-1"
-                name="price"
+                name="prices"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="Rs 21 to Rs 50"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-2")}
                 value="pf-2"
-                name="price"
+                name="prices"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="Rs 51 to Rs 100"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-3")}
                 value="pf-3"
-                name="price"
+                name="prices"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="Rs 101 to Rs 200"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-4")}
                 value="pf-4"
-                name="price"
+                name="prices"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label=" 201 to Rs 500"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-5")}
                 value="pf-5"
-                name="price"
+                name="prices"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="More than Rs 501"
-                onChange={(e) => applyPrice(e)}
+                onChange={trackChanges}
+                checked={priceFilters.includes("pf-6")}
                 value="pf-6"
-                name="price"
+                name="prices"
               />
             </FormGroup>
           </div>
@@ -375,38 +372,43 @@ const Filter = () => {
               <FormControlLabel
                 control={<Checkbox />}
                 label="Upto 5%"
-                onChange={(e) => applyDiscount(e)}
+                onChange={trackChanges}
+                checked={discountFilters.includes("df-1")}
                 value="df-1"
-                name="discount"
+                name="discounts"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="5% - 10%"
-                onChange={(e) => applyDiscount(e)}
+                onChange={trackChanges}
+                checked={discountFilters.includes("df-2")}
                 value="df-2"
-                name="discount"
+                name="discounts"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="10% - 15%"
-                onChange={(e) => applyDiscount(e)}
+                onChange={trackChanges}
+                checked={discountFilters.includes("df-3")}
                 value="df-3"
-                name="discount"
+                name="discounts"
               />
               <FormControlLabel
                 control={<Checkbox />}
                 label="15% - 20%"
-                onChange={(e) => applyDiscount(e)}
+                onChange={trackChanges}
+                checked={discountFilters.includes("df-4")}
                 value="df-4"
-                name="discount"
+                name="discounts"
               />
 
               <FormControlLabel
                 control={<Checkbox />}
                 label="More than 25%"
-                onChange={(e) => applyDiscount(e)}
+                onChange={trackChanges}
+                checked={discountFilters.includes("df-5")}
                 value="df-5"
-                name="discount"
+                name="discounts"
               />
             </FormGroup>
           </div>

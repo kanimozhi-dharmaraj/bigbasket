@@ -235,17 +235,28 @@ const Filter = () => {
 
   const trackChanges = (e)=>{
      const {name,checked ,value} = e.target;
-     console.log({name,checked ,value})
      let searchString = location.search.substring(1);
      let searchParams = searchString ? searchString.split("&") : [];
      if(name === "brands") {
-      (checked === true) ? searchParams.push(`brands=${value}`) : searchParams = searchParams.filter(e => e != `brands=${value}`);
+      if(checked === true) {
+        searchParams.push(`brands=${value}`)
+      } else {
+        searchParams = searchParams.filter(e => e != `brands=${value}`);
+      }
      }
      if(name === "prices") {
-      (checked === true) ? searchParams.push(`prices=${value}`) : searchParams = searchParams.filter(e => e != `prices=${value}`);
+      if(checked === true) {
+        searchParams.push(`prices=${value}`)
+      } else {
+        searchParams = searchParams.filter(e => e != `prices=${value}`);
+      }
      }
      if(name === "discounts") {
-      (checked === true) ? searchParams.push(`discounts=${value}`) : searchParams = searchParams.filter(e => e != `discounts=${value}`);
+      if(checked === true) {
+        searchParams.push(`discounts=${value}`)
+      } else {
+        searchParams = searchParams.filter(e => e != `discounts=${value}`);
+      }
      }
      navigate(`/Filter?${searchParams.join('&')}`);
   }
@@ -266,17 +277,23 @@ const Filter = () => {
         brandValues.includes(item.brand)
       );
       setBrandFilters(brandValues);
+    } else {
+      setBrandFilters([]);
     }
     if (params.get("prices")) {
       const prices = params.getAll("prices");
       productsAfterFiltered = applyPriceFilters(productsAfterFiltered, prices);
       setPriceFilters(prices)
+    } else {
+      setPriceFilters([]);
     }
     if (params.get("discounts")) {
       const discounts = params.getAll("discounts");
       productsAfterFiltered = applyDiscountFilters(productsAfterFiltered, discounts);
       setDiscountFilters(discounts)
-    } 
+    } else {
+      setDiscountFilters([]);
+    }
     setFilteredProducts(productsAfterFiltered);
   }, [location.search]);
   

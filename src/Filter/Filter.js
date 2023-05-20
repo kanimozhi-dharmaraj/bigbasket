@@ -7,6 +7,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import "./Filter.css";
 import SearchIcon from "@mui/icons-material/Search";
+
 import {
   Button,
   CardActionArea,
@@ -31,6 +32,8 @@ const Filter = () => {
   const [discountFilters, setDiscountFilters] = useState([]);
   const [priceFilters, setPriceFilters] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchField, setSearchField] = useState([]);
+  
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -193,7 +196,7 @@ const Filter = () => {
                 100 <
               maxDiscount
           );
-          console.log(filtered)
+          console.log(filtered);
           discountedProducts.push(...filtered);
           break;
         }
@@ -233,39 +236,39 @@ const Filter = () => {
     return discountedProducts;
   }
 
-  const trackChanges = (e)=>{
-     const {name,checked ,value} = e.target;
-     let searchString = location.search.substring(1);
-     let searchParams = searchString ? searchString.split("&") : [];
-     if(name === "brands") {
-      if(checked === true) {
-        searchParams.push(`brands=${value}`)
+  const trackChanges = (e) => {
+    const { name, checked, value } = e.target;
+    let searchString = location.search.substring(1);
+    let searchParams = searchString ? searchString.split("&") : [];
+    if (name === "brands") {
+      if (checked === true) {
+        searchParams.push(`brands=${value}`);
       } else {
-        searchParams = searchParams.filter(e => e != `brands=${value}`);
+        searchParams = searchParams.filter((e) => e !== `brands=${value}`);
       }
-     }
-     if(name === "prices") {
-      if(checked === true) {
-        searchParams.push(`prices=${value}`)
+    }
+    if (name === "prices") {
+      if (checked === true) {
+        searchParams.push(`prices=${value}`);
       } else {
-        searchParams = searchParams.filter(e => e != `prices=${value}`);
+        searchParams = searchParams.filter((e) => e !== `prices=${value}`);
       }
-     }
-     if(name === "discounts") {
-      if(checked === true) {
-        searchParams.push(`discounts=${value}`)
+    }
+    if (name === "discounts") {
+      if (checked === true) {
+        searchParams.push(`discounts=${value}`);
       } else {
-        searchParams = searchParams.filter(e => e != `discounts=${value}`);
+        searchParams = searchParams.filter((e) => e !== `discounts=${value}`);
       }
-     }
-     navigate(`/Filter?${searchParams.join('&')}`);
-  }
+    }
+    navigate(`/Filter?${searchParams.join("&")}`);
+  };
 
   useEffect(() => {
     let productsAfterFiltered = Products;
     const searchString = location.search.substring(1);
     const params = new URLSearchParams(searchString);
-  
+
     if (params.get("sub_category")) {
       productsAfterFiltered = Products.filter(
         (item) => item.sub_category === params.get("sub_category")
@@ -283,21 +286,42 @@ const Filter = () => {
     if (params.get("prices")) {
       const prices = params.getAll("prices");
       productsAfterFiltered = applyPriceFilters(productsAfterFiltered, prices);
-      setPriceFilters(prices)
+      setPriceFilters(prices);
     } else {
       setPriceFilters([]);
     }
     if (params.get("discounts")) {
       const discounts = params.getAll("discounts");
-      productsAfterFiltered = applyDiscountFilters(productsAfterFiltered, discounts);
-      setDiscountFilters(discounts)
+      productsAfterFiltered = applyDiscountFilters(
+        productsAfterFiltered,
+        discounts
+      );
+      setDiscountFilters(discounts);
     } else {
       setDiscountFilters([]);
     }
     setFilteredProducts(productsAfterFiltered);
   }, [location.search]);
-  
 
+  const handleSearchChange = (e) => {
+    const searchText = e.target.value;
+    if (searchText.length > 0) {
+      const filteredBrands = allBrands.filter((brand) =>
+        brand.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setSearchField(filteredBrands);
+      
+      // Filter products based on search text
+      const filteredProducts = Products.filter((product) =>
+        product.brand.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredProducts(filteredProducts);
+    } else {
+      setSearchField("");
+      setFilteredProducts(Products);
+    }
+  }
+  
   return (
     <>
       <div style={{ display: "flex" }}>
@@ -312,11 +336,13 @@ const Filter = () => {
                 placeholder="Search…"
                 inputProps={{ "aria-label": "search" }}
                 sx={{ border: "1px solid black", color: "black" }}
+                onChange={handleSearchChange}
+                value={searchField}
               />
             </Search>
             <div style={{ maxHeight: "200px", overflowY: "auto" }}>
               <FormGroup>
-                {allBrands.map((brand) => (
+                {(searchField.length > 0 ? searchField : allBrands).map((brand) => (
                   <FormControlLabel
                     key={brand}
                     control={<Checkbox />}
@@ -442,130 +468,129 @@ const Filter = () => {
           </h2>
           <hr></hr>
           <Grid container spacing={{ xs: 2, md: 3 }}>
-            {filteredProducts
-              .map((item, i) => (
-                <Grid item xs={12} sm={6} md={3} key={i}>
-                  <Card sx={{ maxWidth: 300 }}>
-                    <CardActionArea>
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={item.image}
-                        alt="green iguana"
-                        sx={{ height: "150px", width: "150px" }}
-                        onClick={() => showProductDetails(item)}
-                      />
-                      <img
-                        src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
-                        alt="veg-icon"
-                      ></img>
-                      <CardContent>
-                        <Typography
-                          gutterBottom
-                          variant="body"
-                          component="div"
-                          className="brandName"
+            {filteredProducts.map((item, i) => (
+              <Grid item xs={12} sm={6} md={3} key={i}>
+                <Card sx={{ maxWidth: 300 }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={item.image}
+                      alt="green iguana"
+                      sx={{ height: "150px", width: "150px" }}
+                      onClick={() => showProductDetails(item)}
+                    />
+                    <img
+                      src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
+                      alt="veg-icon"
+                    ></img>
+                    <CardContent>
+                      <Typography
+                        gutterBottom
+                        variant="body"
+                        component="div"
+                        className="brandName"
+                      >
+                        {item.brand}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.product}
+                      </Typography>
+                      <FormControl fullWidth>
+                        <Select
+                          labelId={`demo-simple-select-label-${i}`}
+                          id={`demo-simple-select-${i}`}
+                          value={prices[i]}
+                          onChange={(e) => handlePrice(e, i)}
+                          defaultValue={item.market_price}
                         >
-                          {item.brand}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.product}
-                        </Typography>
-                        <FormControl fullWidth>
-                          <Select
-                            labelId={`demo-simple-select-label-${i}`}
-                            id={`demo-simple-select-${i}`}
-                            value={prices[i]}
-                            onChange={(e) => handlePrice(e, i)}
-                            defaultValue={item.market_price}
+                          <MenuItem value={item.market_price}>
+                            1 pc - Rs.
+                            {item.sale_price}
+                          </MenuItem>
+                          <MenuItem value={2 * item.market_price}>
+                            2 pcs - Rs.
+                            {(2 * item.sale_price).toFixed(2)}
+                          </MenuItem>
+                          <MenuItem value={5 * item.market_price}>
+                            5 pcs - Rs.
+                            {(5 * item.sale_price).toFixed(2)}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                      <Typography>
+                        MRP{" "}
+                        <span style={{ textDecoration: "line-through" }}>
+                          Rs. {prices[i]}
+                        </span>{" "}
+                        Rs.{selectedPrices[i]}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: "10px",
+                          color: "#333",
+                          fontFamily: "ProximaNovaA-Regular",
+                          marginBottom: "2px",
+                          lineHeight: "15px",
+                        }}
+                      >
+                        <img
+                          src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
+                          width="30px"
+                          height="25px"
+                          alt="transport"
+                        ></img>
+                        <span>Standard Delivery: Tomorrow</span>
+                        <br></br>
+                        <span>9:00AM - 1:30PM</span>
+                      </Typography>
+                      {counters[i] === undefined || 0 ? (
+                        <div>
+                          <TextField
+                            id={`quantity-${i}`}
+                            sx={{ m: 1, width: "10ch" }}
+                            variant="filled"
+                            placeholder="1"
+                          />
+                          <Button
+                            variant="contained"
+                            size="small"
+                            sx={{ color: "#FFFE9D" }}
+                            onClick={() => incrementCount(i)}
                           >
-                            <MenuItem value={item.market_price}>
-                              1 pc - Rs.
-                              {item.sale_price}
-                            </MenuItem>
-                            <MenuItem value={2 * item.market_price}>
-                              2 pcs - Rs.
-                              {(2 * item.sale_price).toFixed(2)}
-                            </MenuItem>
-                            <MenuItem value={5 * item.market_price}>
-                              5 pcs - Rs.
-                              {(5 * item.sale_price).toFixed(2)}
-                            </MenuItem>
-                          </Select>
-                        </FormControl>
-                        <Typography>
-                          MRP{" "}
-                          <span style={{ textDecoration: "line-through" }}>
-                            Rs. {prices[i]}
-                          </span>{" "}
-                          Rs.{selectedPrices[i]}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: "10px",
-                            color: "#333",
-                            fontFamily: "ProximaNovaA-Regular",
-                            marginBottom: "2px",
-                            lineHeight: "15px",
-                          }}
-                        >
-                          <img
-                            src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
-                            width="30px"
-                            height="25px"
-                            alt="transport"
-                          ></img>
-                          <span>Standard Delivery: Tomorrow</span>
-                          <br></br>
-                          <span>9:00AM - 1:30PM</span>
-                        </Typography>
-                        {counters[i] === undefined || 0 ? (
-                          <div>
-                            <TextField
-                              id={`quantity-${i}`}
-                              sx={{ m: 1, width: "10ch" }}
-                              variant="filled"
-                              placeholder="1"
-                            />
-                            <Button
-                              variant="contained"
-                              size="small"
-                              sx={{ color: "#FFFE9D" }}
-                              onClick={() => incrementCount(i)}
-                            >
-                              ADD
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="btn-group" role="group">
-                            <button
-                              type="button"
-                              className="btn btn-warning"
-                              onClick={() => decrementCount(i)}
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              min="1"
-                              defaultValue={counters[i]}
-                              value={counters[i]}
-                              className="form-control"
-                            />
-                            <button
-                              type="button"
-                              className="btn btn-warning"
-                              onClick={() => incrementCount(i)}
-                            >
-                              +
-                            </button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              ))}
+                            ADD
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="btn-group" role="group">
+                          <button
+                            type="button"
+                            className="btn btn-warning"
+                            onClick={() => decrementCount(i)}
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            min="1"
+                            defaultValue={counters[i]}
+                            value={counters[i]}
+                            className="form-control"
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-warning"
+                            onClick={() => incrementCount(i)}
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
         </div>
       </div>

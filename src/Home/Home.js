@@ -16,6 +16,8 @@ import Grid from "@mui/material/Grid";
 import Products from "../Products.json";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_ITEMS } from "../Redux/stateSlice";
 
 const Home = () => {
   //   const [items, setItems] = useState([]);
@@ -23,6 +25,8 @@ const Home = () => {
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const state = useSelector((data)=>data);
   //   const getPosts = async () => {
   //     try {
   //       const response = await fetch(
@@ -62,6 +66,7 @@ const Home = () => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
       newCounters[id] = (newCounters[id] || 0) + 1;
+      dispatch(UPDATE_ITEMS(newCounters));
       return newCounters;
     });
   };

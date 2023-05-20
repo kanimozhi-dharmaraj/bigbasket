@@ -5,9 +5,12 @@ import Filter from './Filter/Filter';
 import Product from './Product/Product';
 import Header from "./Header/Header";
 import Footer from "./Footer/Footer";
+import { Provider, useSelector } from "react-redux";
+import { store } from "./Redux/Store";
 
 const Routing = () => {
-
+  const state = useSelector((data)=>data);
+  console.log("state",state)
 
   return (
     <BrowserRouter>
@@ -25,5 +28,9 @@ const Routing = () => {
     </BrowserRouter>
   );
 };
-
-export default Routing;
+const StateProvider = ()=>{
+  return <Provider store={store}>
+      <Routing />
+  </Provider>
+}
+export default StateProvider;

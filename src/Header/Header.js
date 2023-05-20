@@ -1,6 +1,6 @@
 
 import { styled, alpha } from "@mui/material/styles";
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, Popover, Toolbar, Typography } from '@mui/material'
 import React from 'react'
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
@@ -51,6 +51,18 @@ const Header = () => {
           },
         },
       }));
+      const [anchorEl, setAnchorEl] = React.useState(null);
+
+      const handlePopoverOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+    
+      const handlePopoverClose = () => {
+        setAnchorEl(null);
+      };
+    
+      const open = Boolean(anchorEl);
+    
   return (
     <Box sx={{ flexGrow: 1 }}>
     <AppBar position="static" sx={{ background: "white", color: "black" }}>
@@ -86,13 +98,37 @@ const Header = () => {
         </Search>
 
         <Box sx={{ flexGrow: 1 }} />
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: "#f1f3f4", color: "black" }}
-        >
-          <ShoppingBasketIcon sx={{ color: "#DA251D" }} />
-          My Basket
-        </Button>
+        <div>
+        <ShoppingBasketIcon sx={{ color: "#DA251D" }} />
+      <Typography
+        aria-owns={open ? 'mouse-over-popover' : undefined}
+        aria-haspopup="true"
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+      >
+        My Basket
+      </Typography>
+      <Popover
+        id="mouse-over-popover"
+        sx={{
+          pointerEvents: 'none',
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        onClose={handlePopoverClose}
+        disableRestoreFocus
+      >
+        <Typography sx={{ p: 1 }}>I use Popover.</Typography>
+      </Popover>
+    </div>
         {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}
       </Toolbar>
     </AppBar>

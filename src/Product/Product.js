@@ -63,6 +63,15 @@ const Product = () => {
     setMarketPrice(clickedMarketPrice);
     setSalePrice(clickedSalePrice);
   };
+
+  // useEffect(() => {
+  //    const cartItem = {
+  //     index: product.index,
+  //     quantity: counter,
+  //     varient: clickedElement
+  //    }
+  // }, [counter])
+
   return (
     <>
       <Card>

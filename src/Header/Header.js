@@ -1,15 +1,20 @@
 
 import { styled, alpha } from "@mui/material/styles";
 import { AppBar, Box, Button, Popover, Toolbar, Typography } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import { useDispatch, useSelector } from "react-redux";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const state = useSelector((data)=>data);
+  console.log(state);
+  const [productsInCart,setProductsInCart] = useState(state.data.cartItems || {})
     const Search = styled("div")(({ theme }) => ({
         position: "relative",
         borderRadius: theme.shape.borderRadius,
@@ -62,6 +67,10 @@ const Header = () => {
       };
     
       const open = Boolean(anchorEl);
+
+      const showCartItems = () =>{
+        setProductsInCart(`<div>Hello</div>`);
+      }
     
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -126,7 +135,7 @@ const Header = () => {
         onClose={handlePopoverClose}
         disableRestoreFocus
       >
-        <Typography sx={{ p: 1 }}>I use Popover.</Typography>
+        <div style={{ p: 1 }} onClick={showCartItems}>{productsInCart}</div>
       </Popover>
     </div>
         {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}

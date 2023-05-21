@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -22,51 +22,34 @@ import { UPDATE_ITEMS } from "../Redux/stateSlice";
 const Home = () => {
   //   const [items, setItems] = useState([]);
   const [prices, setPrices] = useState([]);
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
+  
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((data)=>data);
-  //   const getPosts = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         "https://dummyjson.com/products?skip=14&limit=8"
-  //       );
-  //       const json = await response.json();
-  //       setItems(json["products"]);
-  //       setSelectedPrices(
-  //         json["products"].map((item) =>
-  //           (item.price - (item.price * item.discountPercentage) / 100).toFixed(2)
-  //         )
-  //       );
-
-  //       console.log(json);
-  //     } catch (error) {
-  //       console.log("Error", error);
-  //     }
-  //   };
-  //   useEffect(() => {
-  //     getPosts();
-  //   }, []);
-  const handlePrice = (e, index) => {
-    const itemPrice = e.target.value;
-    setPrices((prevPrices) => {
-      const newPrices = [...prevPrices];
-      newPrices[index] = itemPrice;
-      return newPrices;
-    });
-    setSelectedPrices((prevSelectedPrices) => {
-      const newSelectedPrices = [...prevSelectedPrices];
-      newSelectedPrices[index] = e.target.value;
-      console.log(newSelectedPrices[index]);
-      return newSelectedPrices;
-    });
+  console.log(state);
+  
+  const [productsInCart, setProductsInCart] = useState(state.data.cartItems || {});
+  const chooseVariant = (e) => {
+    // 1st {1: 0, 2:3}
+    const value = e.target.value;
+    const [index, unit] = value.split('-');
+    let existingVariant = selectedVariants;
+    existingVariant[index] = Number(unit);
+    console.log(existingVariant)
+    setSelectedVariants(existingVariant);
   };
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
-      newCounters[id] = (newCounters[id] || 0) + 1;
-      dispatch(UPDATE_ITEMS(newCounters));
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] = (newCounters[id][selectedVariant] || 0) + 1;
+      
       return newCounters;
     });
   };
@@ -74,16 +57,47 @@ const Home = () => {
   const decrementCount = (id) => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
-      newCounters[id] = Math.max((newCounters[id] || 0) - 1, 0);
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] = Math.max((newCounters[id][selectedVariant] || 0) - 1, 0);
       return newCounters;
     });
   };
+
+  const updateProductsInCart = () => {
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
+    
+    for (const pIndex in counters) {
+      const unit = selectedVariants[pIndex] || 0;
+      newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
+      console.log(newProductsToCart[pIndex][unit]);
+      newProductsToCart[pIndex][unit] = {
+        quantity: counters[pIndex][unit] || 1
+      };
+    }
+  
+    setProductsInCart(newProductsToCart);
+    dispatch(UPDATE_ITEMS(newProductsToCart));
+    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
+  };
+  
+
+  const getQuantity = (pIndex) => {
+    let unit = selectedVariants[pIndex] || 0;
+    return counters[pIndex]?.[unit] || 0;
+  }
+
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
   const goToRelevantPage = (item) => {
     navigate(`/Filter?sub_category=${item.sub_category}`);
   };
+
+  useEffect(() => {
+    updateProductsInCart();
+  }, [counters]);
 
   return (
     <div>
@@ -129,25 +143,18 @@ const Home = () => {
                   </Typography>
                   <FormControl fullWidth>
                     <Select
-                      labelId={`demo-simple-select-label-${i}`}
-                      id={`demo-simple-select-${i}`}
+                      labelId={`demo-simple-select-label-${item.index}`}
+                      id={`demo-simple-select-${item.index}`}
                       value={prices[i]}
-                      onChange={(e) => handlePrice(e, i)}
-                      defaultValue={item.market_price}
+                      onChange={(e) => chooseVariant(e)}
+                      defaultValue={`${item.index}-0`}
                       className="dropDownBox"
                     >
-                      <MenuItem value={item.market_price}>
-                        1 pc - Rs.
-                        {item.sale_price}
-                      </MenuItem>
-                      <MenuItem value={2 * item.market_price}>
-                        2 pcs - Rs.
-                        {(2 * item.sale_price).toFixed(2)}
-                      </MenuItem>
-                      <MenuItem value={5 * item.market_price}>
-                        5 pcs - Rs.
-                        {(5 * item.sale_price).toFixed(2)}
-                      </MenuItem>
+                      {item.units.map((unitObj, unitIndex)=>(
+                      <MenuItem value={`${item.index}-${unitIndex}`}>
+                        {unitObj.unit} - Rs.
+                        {item.sale_price * unitObj.multiple}
+                      </MenuItem>))}
                     </Select>
                   </FormControl>
                   <Typography>
@@ -170,10 +177,11 @@ const Home = () => {
                       <span>9:00AM - 1:30PM</span>
                     </p>
                   </Typography>
-                  {counters[i] === undefined || 0 ? (
+                  {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
+                  {getQuantity(item.index) === 0 ? (
                     <div>
                       <TextField
-                        id={`quantity-${i}`}
+                        id={`quantity-${item.index}`}
                         sx={{ m: 1, width: "10ch" }}
                         variant="filled"
                         placeholder="1"
@@ -182,7 +190,7 @@ const Home = () => {
                         variant="contained"
                         size="small"
                         sx={{ color: "#FFFE9D" }}
-                        onClick={() => incrementCount(i)}
+                        onClick={() => incrementCount(item.index)}
                       >
                         ADD
                       </Button>
@@ -192,21 +200,22 @@ const Home = () => {
                       <button
                         type="button"
                         className="btn btn-warning"
-                        onClick={() => decrementCount(i)}
+                        onClick={() => decrementCount(item.index)}
                       >
                         -
                       </button>
                       <input
                         type="number"
                         min="1"
-                        defaultValue={counters[i]}
-                        value={counters[i]}
+                        defaultValue={counters[item.index][selectedVariants[item.index] || 0]}
+                        value={counters[item.index][selectedVariants[item.index] || 0]}
                         className="form-control"
+                        onChange={getQuantity(item.index)}
                       />
                       <button
                         type="button"
                         className="btn btn-warning"
-                        onClick={() => incrementCount(i)}
+                        onClick={() => incrementCount(item.index)}
                       >
                         +
                       </button>
@@ -221,8 +230,10 @@ const Home = () => {
       <h2 style={{ textAlign: "center" }}>Fruits and Vegetables</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {Products
-          .filter((product) => product.category === "Fruits & Vegetables").slice(8,12)
+        {Products.filter(
+          (product) => product.category === "Fruits & Vegetables"
+        )
+          .slice(8, 12)
           .map((item, i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
               <Card sx={{ maxWidth: 345 }}>
@@ -244,8 +255,9 @@ const Home = () => {
       <h2 style={{ textAlign: "center" }}>Beverages</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 2 }}>
-        {Products.slice(10,16).filter((product) => product.category === "Beverages").map(
-          (item, i) => (
+        {Products.slice(10, 16)
+          .filter((product) => product.category === "Beverages")
+          .map((item, i) => (
             <Grid item xs={12} sm={6} md={2} key={i}>
               <Card sx={{ maxWidth: 345 }}>
                 <CardActionArea>
@@ -260,14 +272,17 @@ const Home = () => {
                 </CardActionArea>
               </Card>
             </Grid>
-          )
-        )}
+          ))}
       </Grid>
       <h2 style={{ textAlign: "center" }}>Snack Store</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {Products
-          .filter((product) => product.category === "Gourmet & World Food" ||  product.category === "Snacks & Branded Foods").slice(1,5)
+        {Products.filter(
+          (product) =>
+            product.category === "Gourmet & World Food" ||
+            product.category === "Snacks & Branded Foods"
+        )
+          .slice(1, 5)
           .map((item, i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
               <Card sx={{ maxWidth: 345 }}>

@@ -9,13 +9,13 @@ const stateSlice = createSlice({
     reducers : {
        
         ADD_ITEMS : (state,action)=>{
-            state.tasks = action.payload
+            state.cartItems = action.payload
         },
         UPDATE_ITEMS : (state,action)=>{
-            state.tasks = action.payload
+            state.cartItems = action.payload
         },
         DELETE_ITEMS : (state,action)=>{
-            state.tasks = action.payload
+            state.cartItems = action.payload
         },
         
     }

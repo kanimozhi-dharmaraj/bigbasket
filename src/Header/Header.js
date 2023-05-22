@@ -16,6 +16,10 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import Products from "../Products.json";
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -78,26 +82,30 @@ const Header = () => {
   const showItemsInCart = () => {
     const cartItems = state.data.cartItems;
     const products = [];
-    for (const pIndex in cartItems) { //Products
-      let productDetail = Products.filter(product => parseInt(product.index) === parseInt(pIndex)).pop();
+    for (const pIndex in cartItems) {
+      //Products
+      let productDetail = Products.filter(
+        (product) => parseInt(product.index) === parseInt(pIndex)
+      ).pop();
       let cartProductObject = {
         index: productDetail.index,
         name: productDetail.product,
         market_price: productDetail.market_price,
         sale_price: productDetail.sale_price,
-        image: "https://www.bigbasket.com/media/uploads/p/s/10000069_20-fresho-capsicum-green.jpg"
-      }
+        image: productDetail.image,
+      };
 
-      for (const vIndex in cartItems[pIndex]) { //Variants
+      for (const vIndex in cartItems[pIndex]) {
+        //Variants
         let variantObject = {
           unit: productDetail.units[vIndex].unit,
-          quantity: cartItems[pIndex][vIndex]['quantity']
+          quantity: cartItems[pIndex][vIndex]["quantity"],
         };
-        products.push({...cartProductObject, ...variantObject});
+        products.push({ ...cartProductObject, ...variantObject });
       }
     }
     return products;
-  }
+  };
 
   const open = Boolean(anchorEl);
   return (
@@ -163,9 +171,47 @@ const Header = () => {
               onClose={handlePopoverClose}
               disableRestoreFocus
             >
-  <div style={{ p: 1 }}>
-    {showItemsInCart().map((product) => <div>{product.name} - {product.unit} - {product.quantity}</div>)}
-  </div>
+              <div>
+                {showItemsInCart().map((product) => (
+              //     <div key={index}>
+              //       <div><img src={product.image} alt="product-img"></img></div>
+              //       <div>{product.name} 
+              //       {product.unit}
+              //        {product.quantity}</div>
+              //     </div>
+              //   ))}
+              // </div>
+              <Card sx={{ display: 'flex' }}>
+              
+              <CardMedia
+                component="img"
+                sx={{ width: 151 }}
+                image={product.image}
+                alt="Product-image"
+              />
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flex: '1 0 auto' }}>
+                  <Typography component="div" variant="h6">
+                    {product.name} {product.unit}
+                  </Typography>
+                  <Typography variant="subtitle1" color="text.secondary" component="div">
+                    {product.quantity}
+                  </Typography>
+                </CardContent>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+                  <IconButton aria-label="previous">
+                    {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
+                  </IconButton>
+                  <IconButton aria-label="play/pause">
+                    <PlayArrowIcon sx={{ height: 38, width: 38 }} />
+                  </IconButton>
+                  <IconButton aria-label="next">
+                    {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
+                  </IconButton>
+                </Box> */}
+              </Box>
+            </Card>))}
+    </div>
             </Popover>
           </div>
           {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}

@@ -14,7 +14,7 @@ const stateSlice = createSlice({
         UPDATE_ITEMS : (state,action)=>{
             state.cartItems = action.payload
         },
-        DELETE_ITEMS : (state,action)=>{
+        UPDATE_CART_ITEMS : (state,action)=>{
             state.cartItems = action.payload
         },
         

@@ -3,6 +3,8 @@ import {
   AppBar,
   Box,
   Button,
+  Icon,
+  Input,
   Popover,
   Toolbar,
   Typography,
@@ -16,18 +18,21 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import Products from "../Products.json";
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const Header = () => {
+  const [totalProductsInCart, setTotalProductsInCart] = useState(0);
+
+  const [num, setNum] = useState(0);
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
   console.log(state);
-  const [productsInCart, setProductsInCart] = useState(
-    state.data.cartItems || {}
-  );
+  const [productsInCart, setProductsInCart] = useState([]);
+  const [removeCartItem, setRemoveCartItem] = useState([])
   const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
@@ -71,11 +76,11 @@ const Header = () => {
   }));
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handlePopoverOpen = (event) => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handlePopoverClose = () => {
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
@@ -101,13 +106,43 @@ const Header = () => {
           unit: productDetail.units[vIndex].unit,
           quantity: cartItems[pIndex][vIndex]["quantity"],
         };
+
         products.push({ ...cartProductObject, ...variantObject });
       }
     }
+    // setTotalProductsInCart(products.length)
     return products;
   };
-
+  let incNum = () => {
+    if (num < 10) {
+      setNum(Number(num) + 1);
+    }
+  };
+  let decNum = () => {
+    if (num > 0) {
+      setNum(num - 1);
+    }
+  };
+  let handleChange = (e) => {
+    setNum(e.target.value);
+  };
+  function handleRemove(id) {
+    const updatedCartItems = { ...state.data.cartItems };
+    for (const pIndex in updatedCartItems) {
+      if (Array.isArray(updatedCartItems[pIndex])) {
+        updatedCartItems[pIndex] = updatedCartItems[pIndex].filter(
+          (item) => parseInt(item.index) !== parseInt(id)
+        );
+      }
+    }
+    
+    dispatch({ type: "UPDATE_CART_ITEMS", payload: updatedCartItems });
+    setRemoveCartItem(id); // Set the removed item ID
+  }
+  
   const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ background: "white", color: "black" }}>
@@ -145,60 +180,95 @@ const Header = () => {
           <Box sx={{ flexGrow: 1 }} />
           <div>
             <ShoppingBasketIcon sx={{ color: "#DA251D" }} />
-            <Typography
-              aria-owns={open ? "mouse-over-popover" : undefined}
-              aria-haspopup="true"
-              onMouseEnter={handlePopoverOpen}
-              onMouseLeave={handlePopoverClose}
+            <Button
+              aria-describedby={id}
+              variant="contained"
+              onClick={handleClick}
             >
               My Basket
-            </Typography>
+            </Button>
             <Popover
-              id="mouse-over-popover"
-              sx={{
-                pointerEvents: "none",
-              }}
+              id={id}
               open={open}
               anchorEl={anchorEl}
+              onClose={handleClose}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "left",
               }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              onClose={handlePopoverClose}
-              disableRestoreFocus
             >
               <div>
-                {showItemsInCart().map((product) => (
-              //     <div key={index}>
-              //       <div><img src={product.image} alt="product-img"></img></div>
-              //       <div>{product.name} 
-              //       {product.unit}
-              //        {product.quantity}</div>
-              //     </div>
-              //   ))}
-              // </div>
-              <Card sx={{ display: 'flex' }}>
-              
-              <CardMedia
-                component="img"
-                sx={{ width: 151 }}
-                image={product.image}
-                alt="Product-image"
-              />
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flex: '1 0 auto' }}>
-                  <Typography component="div" variant="h6">
-                    {product.name} {product.unit}
-                  </Typography>
-                  <Typography variant="subtitle1" color="text.secondary" component="div">
-                    {product.quantity}
-                  </Typography>
-                </CardContent>
-                {/* <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
+                {showItemsInCart().length > 0 ? (
+                  showItemsInCart().map((product) => (
+                    //     <div key={index}>
+                    //       <div><img src={product.image} alt="product-img"></img></div>
+                    //       <div>{product.name}
+                    //       {product.unit}
+                    //        {product.quantity}</div>
+                    //     </div>
+                    //   ))}
+                    // </div>
+                    <Card key={product.index} sx={{ display: "flex", width:'800px' }}>
+                      <CardMedia
+                        component="img"
+                        sx={{ width: 151 }}
+                        image={product.image}
+                        alt="Product-image"
+                      />
+                      <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <CardContent sx={{ flex: "1 0 auto" }}>
+                          <Typography  variant="h6">
+                            {product.name} {product.unit}
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            color="text.secondary"
+                            
+                          >
+                            {product.quantity}*{product.sale_price}
+                          </Typography>
+                        </CardContent>
+                        <CardActions sx={{display:'flex'}}>
+                          <div className="col-xl-1">
+                            <div class="input-group">
+                              <div class="input-group-prepend">
+                                <button
+                                  class="btn btn-outline-primary"
+                                  type="button"
+                                  onClick={decNum}
+                                >
+                                  -
+                                </button>
+                              </div>
+                              <input
+                                type="text"
+                                class="form-control"
+                                value={num}
+                                onChange={handleChange}
+                              />
+                              <div class="input-group-prepend">
+                                <button
+                                  class="btn btn-outline-primary"
+                                  type="button"
+                                  onClick={incNum}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardActions>
+                        <Typography>
+                          Rs {product.sale_price.toFixed(2)}
+                          <div>
+                            Saved Rs {product.market_price - product.sale_price}{" "}
+                          </div>
+                        </Typography>
+                        <Button onClick={() => handleRemove(product.index)} value={removeCartItem}>
+                        <ClearIcon>
+                        </ClearIcon>
+                          </Button>
+                        {/* <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
                   <IconButton aria-label="previous">
                     {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
                   </IconButton>
@@ -209,9 +279,13 @@ const Header = () => {
                     {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
                   </IconButton>
                 </Box> */}
-              </Box>
-            </Card>))}
-    </div>
+                      </Box>
+                    </Card>
+                  ))
+                ) : (
+                  <div>The Cart is Empty</div>
+                )}
+              </div>
             </Popover>
           </div>
           {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}

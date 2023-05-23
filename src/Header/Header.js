@@ -27,12 +27,12 @@ import ClearIcon from "@mui/icons-material/Clear";
 const Header = () => {
   const [totalProductsInCart, setTotalProductsInCart] = useState(0);
 
-  const [num, setNum] = useState(0);
+  const [quantity, setQuantity] = useState(0);
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
   console.log(state);
   const [productsInCart, setProductsInCart] = useState([]);
-  const [removeCartItem, setRemoveCartItem] = useState([])
+  const [removeCartItem, setRemoveCartItem] = useState([]);
   const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
@@ -87,6 +87,7 @@ const Header = () => {
   const showItemsInCart = () => {
     const cartItems = state.data.cartItems;
     const products = [];
+
     for (const pIndex in cartItems) {
       //Products
       let productDetail = Products.filter(
@@ -114,32 +115,54 @@ const Header = () => {
     return products;
   };
   let incNum = () => {
-    if (num < 10) {
-      setNum(Number(num) + 1);
+    if (quantity < 10) {
+      setQuantity(Number(quantity) + 1);
     }
   };
   let decNum = () => {
-    if (num > 0) {
-      setNum(num - 1);
+    if (quantity > 0) {
+      setQuantity(quantity - 1);
     }
   };
   let handleChange = (e) => {
-    setNum(e.target.value);
+    setQuantity(e.target.value);
   };
-  function handleRemove(id) {
+  function handleRemove(index) {
     const updatedCartItems = { ...state.data.cartItems };
+  
     for (const pIndex in updatedCartItems) {
       if (Array.isArray(updatedCartItems[pIndex])) {
         updatedCartItems[pIndex] = updatedCartItems[pIndex].filter(
-          (item) => parseInt(item.index) !== parseInt(id)
+          (item) => parseInt(item.index) !== parseInt(index)
         );
+  
+        if (updatedCartItems[pIndex].length === 0) {
+          delete updatedCartItems[pIndex];
+        }
       }
     }
-    
+  
     dispatch({ type: "UPDATE_CART_ITEMS", payload: updatedCartItems });
-    setRemoveCartItem(id); // Set the removed item ID
+  
+    // Update local state by filtering out the removed item
+    setProductsInCart((prevProducts) =>
+      prevProducts.filter((product) => parseInt(product.index) !== parseInt(index))
+    );
   }
   
+  
+    
+  
+  const calculateSubtotal = () => {
+    let subtotal = 0;
+  
+    for (const product of showItemsInCart()) {
+      subtotal += product.sale_price * product.quantity;
+    }
+  
+    return subtotal.toFixed(2);
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
@@ -208,7 +231,10 @@ const Header = () => {
                     //     </div>
                     //   ))}
                     // </div>
-                    <Card key={product.index} sx={{ display: "flex", width:'800px' }}>
+                    <Card
+                      key={product.index}
+                      sx={{ display: "flex", width: "800px" }}
+                    >
                       <CardMedia
                         component="img"
                         sx={{ width: 151 }}
@@ -217,18 +243,17 @@ const Header = () => {
                       />
                       <Box sx={{ display: "flex", flexDirection: "row" }}>
                         <CardContent sx={{ flex: "1 0 auto" }}>
-                          <Typography  variant="h6">
+                          <Typography variant="h6">
                             {product.name} {product.unit}
                           </Typography>
                           <Typography
                             variant="subtitle1"
                             color="text.secondary"
-                            
                           >
                             {product.quantity}*{product.sale_price}
                           </Typography>
                         </CardContent>
-                        <CardActions sx={{display:'flex'}}>
+                        <CardActions sx={{ display: "flex" }}>
                           <div className="col-xl-1">
                             <div class="input-group">
                               <div class="input-group-prepend">
@@ -243,7 +268,7 @@ const Header = () => {
                               <input
                                 type="text"
                                 class="form-control"
-                                value={num}
+                                value={product.quantity}
                                 onChange={handleChange}
                               />
                               <div class="input-group-prepend">
@@ -264,10 +289,12 @@ const Header = () => {
                             Saved Rs {product.market_price - product.sale_price}{" "}
                           </div>
                         </Typography>
-                        <Button onClick={() => handleRemove(product.index)} value={removeCartItem}>
-                        <ClearIcon>
-                        </ClearIcon>
-                          </Button>
+                        <Button
+                          onClick={() => handleRemove(parseInt(product.index))}
+                         
+                        >
+                          <ClearIcon></ClearIcon>
+                        </Button>
                         {/* <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
                   <IconButton aria-label="previous">
                     {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
@@ -286,6 +313,22 @@ const Header = () => {
                   <div>The Cart is Empty</div>
                 )}
               </div>
+              <Card>
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <Typography>
+                  **Actual Delivery Charges computed at checkout{" "}
+                </Typography>
+                <Typography>
+                <div>
+                  Sub Total :{calculateSubtotal()}
+                 
+                </div>
+                <div>Delivery Charge : **</div>
+                </Typography>
+                </Box>
+                <Button>View Basket and Checkout</Button>
+               
+              </Card>
             </Popover>
           </div>
           {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}

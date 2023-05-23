@@ -7,6 +7,8 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import "./Filter.css";
 import SearchIcon from "@mui/icons-material/Search";
+import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_ITEMS } from "../Redux/stateSlice";
 
 import {
   Button,
@@ -33,11 +35,19 @@ const Filter = () => {
   const [priceFilters, setPriceFilters] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchField, setSearchField] = useState([]);
-  
+  const [selectedVariants, setSelectedVariants] = useState({});
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const dispatch = useDispatch();
+  const state = useSelector((data) => data);
+
+  console.log(state);
+  const [productsInCart, setProductsInCart] = useState(
+    state.data.cartItems || {}
+  );
   // useEffect(() => {
   //     setProduct(
   //       Products.find((item) => item.sub_category === (params.get("sub_category")))
@@ -47,24 +57,24 @@ const Filter = () => {
   // console.log(
   //   Products.filter((item) => item.sub_category === params.get("sub_category"))
   // );
-  const handlePrice = (e, index) => {
-    const itemPrice = e.target.value;
-    setPrices((prevPrices) => {
-      const newPrices = [...prevPrices];
-      newPrices[index] = itemPrice;
-      return newPrices;
-    });
-    setSelectedPrices((prevSelectedPrices) => {
-      const newSelectedPrices = [...prevSelectedPrices];
-      newSelectedPrices[index] = e.target.value;
-      console.log(newSelectedPrices[index]);
-      return newSelectedPrices;
-    });
+  const chooseVariant = (e) => {
+    // 1st {1: 0, 2:3}
+    const value = e.target.value;
+    const [index, unit] = value.split("-");
+    let existingVariant = selectedVariants;
+    existingVariant[index] = Number(unit);
+    console.log(existingVariant);
+    setSelectedVariants(existingVariant);
   };
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
-      newCounters[id] = (newCounters[id] || 0) + 1;
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] =
+        (newCounters[id][selectedVariant] || 0) + 1;
+
       return newCounters;
     });
   };
@@ -72,10 +82,61 @@ const Filter = () => {
   const decrementCount = (id) => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
-      newCounters[id] = Math.max((newCounters[id] || 0) - 1, 0);
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] = Math.max(
+        (newCounters[id][selectedVariant] || 0) - 1,
+        0
+      );
       return newCounters;
     });
   };
+
+  const updateProductsInCart = () => {
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
+
+    for (const pIndex in counters) {
+      const unit = selectedVariants[pIndex] || 0;
+      newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
+      console.log(newProductsToCart[pIndex][unit]);
+      newProductsToCart[pIndex][unit] = {
+        quantity: counters[pIndex][unit] || 1,
+      };
+    }
+
+    setProductsInCart(newProductsToCart);
+    dispatch(UPDATE_ITEMS(newProductsToCart));
+    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
+  };
+
+  const getQuantity = (pIndex) => {
+    let unit = selectedVariants[pIndex] || 0;
+    return counters[pIndex]?.[unit] || 0;
+  };
+
+  const goToRelevantPage = (item) => {
+    navigate(`/Filter?sub_category=${item.sub_category}`);
+  };
+
+  useEffect(() => {
+    updateProductsInCart();
+  }, [counters]);
+  // const handlePrice = (e, index) => {
+  //   const itemPrice = e.target.value;
+  //   setPrices((prevPrices) => {
+  //     const newPrices = [...prevPrices];
+  //     newPrices[index] = itemPrice;
+  //     return newPrices;
+  //   });
+  //   setSelectedPrices((prevSelectedPrices) => {
+  //     const newSelectedPrices = [...prevSelectedPrices];
+  //     newSelectedPrices[index] = e.target.value;
+  //     console.log(newSelectedPrices[index]);
+  //     return newSelectedPrices;
+  //   });
+  // };
+
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
@@ -300,6 +361,7 @@ const Filter = () => {
     } else {
       setDiscountFilters([]);
     }
+    console.log(productsAfterFiltered);
     setFilteredProducts(productsAfterFiltered);
   }, [location.search]);
 
@@ -310,7 +372,7 @@ const Filter = () => {
         brand.toLowerCase().includes(searchText.toLowerCase())
       );
       setSearchField(filteredBrands);
-      
+
       // Filter products based on search text
       const filteredProducts = Products.filter((product) =>
         product.brand.toLowerCase().includes(searchText.toLowerCase())
@@ -320,8 +382,8 @@ const Filter = () => {
       setSearchField("");
       setFilteredProducts(Products);
     }
-  }
-  
+  };
+
   return (
     <>
       <div style={{ display: "flex" }}>
@@ -342,17 +404,19 @@ const Filter = () => {
             </Search>
             <div style={{ maxHeight: "200px", overflowY: "auto" }}>
               <FormGroup>
-                {(searchField.length > 0 ? searchField : allBrands).map((brand) => (
-                  <FormControlLabel
-                    key={brand}
-                    control={<Checkbox />}
-                    label={brand}
-                    onChange={trackChanges}
-                    checked={brandFilters.includes(brand)}
-                    value={brand}
-                    name="brands"
-                  />
-                ))}
+                {(searchField.length > 0 ? searchField : allBrands).map(
+                  (brand) => (
+                    <FormControlLabel
+                      key={brand}
+                      control={<Checkbox />}
+                      label={brand}
+                      onChange={trackChanges}
+                      checked={brandFilters.includes(brand)}
+                      value={brand}
+                      name="brands"
+                    />
+                  )
+                )}
               </FormGroup>
             </div>
           </div>
@@ -470,7 +534,7 @@ const Filter = () => {
           <Grid container spacing={{ xs: 2, md: 3 }}>
             {filteredProducts.map((item, i) => (
               <Grid item xs={12} sm={6} md={3} key={i}>
-                <Card sx={{ maxWidth: 300 }}>
+                <Card sx={{ maxWidth: 345 }}>
                   <CardActionArea>
                     <CardMedia
                       component="img"
@@ -493,31 +557,38 @@ const Filter = () => {
                       >
                         {item.brand}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        className="productName"
+                        onClick={() => showProductDetails(item)}
+                      >
                         {item.product}
                       </Typography>
-                      <FormControl fullWidth>
-                        <Select
-                          labelId={`demo-simple-select-label-${i}`}
-                          id={`demo-simple-select-${i}`}
-                          value={prices[i]}
-                          onChange={(e) => handlePrice(e, i)}
-                          defaultValue={item.market_price}
-                        >
-                          <MenuItem value={item.market_price}>
-                            1 pc - Rs.
-                            {item.sale_price}
-                          </MenuItem>
-                          <MenuItem value={2 * item.market_price}>
-                            2 pcs - Rs.
-                            {(2 * item.sale_price).toFixed(2)}
-                          </MenuItem>
-                          <MenuItem value={5 * item.market_price}>
-                            5 pcs - Rs.
-                            {(5 * item.sale_price).toFixed(2)}
-                          </MenuItem>
-                        </Select>
-                      </FormControl>
+                      {item.units && item.units.length > 0 ? (
+                        <FormControl fullWidth>
+                          <Select
+                            labelId={`demo-simple-select-label-${item.index}`}
+                            id={`demo-simple-select-${item.index}`}
+                            value={prices[i]}
+                            onChange={(e) => chooseVariant(e)}
+                            defaultValue={`${item.index}-0`}
+                          >
+                            {item.units.map((unitObj, unitIndex) => (
+                              <MenuItem
+                                value={`${item.index}-${unitIndex}`}
+                                key={unitIndex}
+                              >
+                                {unitObj.unit} - Rs.{" "}
+                                {item.sale_price * unitObj.multiple}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        ""
+                      )}
+
                       <Typography>
                         MRP{" "}
                         <span style={{ textDecoration: "line-through" }}>
@@ -525,29 +596,24 @@ const Filter = () => {
                         </span>{" "}
                         Rs.{selectedPrices[i]}
                       </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "10px",
-                          color: "#333",
-                          fontFamily: "ProximaNovaA-Regular",
-                          marginBottom: "2px",
-                          lineHeight: "15px",
-                        }}
-                      >
+                      <Typography className="DeliveryDetail">
                         <img
                           src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
-                          width="30px"
-                          height="25px"
+                          className="transport"
                           alt="transport"
                         ></img>
-                        <span>Standard Delivery: Tomorrow</span>
-                        <br></br>
-                        <span>9:00AM - 1:30PM</span>
+
+                        <p className="deliveryTime">
+                          <span>Standard Delivery: Tomorrow</span>
+                          <br></br>
+                          <span>9:00AM - 1:30PM</span>
+                        </p>
                       </Typography>
-                      {counters[i] === undefined || 0 ? (
+                      {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
+                      {getQuantity(item.index) === 0 ? (
                         <div>
                           <TextField
-                            id={`quantity-${i}`}
+                            id={`quantity-${item.index}`}
                             sx={{ m: 1, width: "10ch" }}
                             variant="filled"
                             placeholder="1"
@@ -556,7 +622,7 @@ const Filter = () => {
                             variant="contained"
                             size="small"
                             sx={{ color: "#FFFE9D" }}
-                            onClick={() => incrementCount(i)}
+                            onClick={() => incrementCount(item.index)}
                           >
                             ADD
                           </Button>
@@ -566,21 +632,30 @@ const Filter = () => {
                           <button
                             type="button"
                             className="btn btn-warning"
-                            onClick={() => decrementCount(i)}
+                            onClick={() => decrementCount(item.index)}
                           >
                             -
                           </button>
                           <input
                             type="number"
                             min="1"
-                            defaultValue={counters[i]}
-                            value={counters[i]}
+                            defaultValue={
+                              counters[item.index][
+                                selectedVariants[item.index] || 0
+                              ]
+                            }
+                            value={
+                              counters[item.index][
+                                selectedVariants[item.index] || 0
+                              ]
+                            }
                             className="form-control"
+                            onChange={getQuantity(item.index)}
                           />
                           <button
                             type="button"
                             className="btn btn-warning"
-                            onClick={() => incrementCount(i)}
+                            onClick={() => incrementCount(item.index)}
                           >
                             +
                           </button>
@@ -592,6 +667,7 @@ const Filter = () => {
               </Grid>
             ))}
           </Grid>
+          
         </div>
       </div>
     </>

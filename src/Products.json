@@ -368,7 +368,7 @@
  },
  {
    "index": 18,
-   "product": "Apple - Washington 4 pcs + Kiwi - Green 3 pcs + Pomegranate 4 pcs",
+   "product": "Apple - Washington 4 pcs ",
    "brand": "Fresho",
    "market_price": 658.75,
    "sale_price": 527,
@@ -379,11 +379,23 @@
    "benefits": "",
    "storage_uses": "",
    "other_product_info": "",
-   "variable_weight_policy": ""
+   "variable_weight_policy": "",
+   "units": [ {
+    "unit": "500 g",
+    "multiple":1
+  },
+  {
+    "unit": "1 kg",
+    "multiple":2
+  },
+  {
+    "unit": "2 kg",
+    "multiple":4
+  }]
  },
  {
    "index": 19,
-   "product": "Apple Shimla 4 pcs + Banana Robusta 1 kg + Watermelon Small + Papaya Medium 1 pc",
+   "product": "Apple Shimla 4 pcs + Banana Robusta 1 kg ",
    "brand": "Fresho",
    "market_price": 327.5,
    "sale_price": 228.3,
@@ -394,7 +406,19 @@
    "benefits": "",
    "storage_uses": "",
    "other_product_info": "",
-   "variable_weight_policy": ""
+   "variable_weight_policy": "",
+   "units": [ {
+    "unit": "500 g",
+    "multiple":1
+  },
+  {
+    "unit": "1 kg",
+    "multiple":2
+  },
+  {
+    "unit": "2 kg",
+    "multiple":4
+  }]
  },
  {
    "index": 20,
@@ -409,7 +433,19 @@
    "benefits": "",
    "storage_uses": "",
    "other_product_info": "",
-   "variable_weight_policy": ""
+   "variable_weight_policy": "",
+   "units": [ {
+    "unit": "500 g",
+    "multiple":1
+  },
+  {
+    "unit": "1 kg",
+    "multiple":2
+  },
+  {
+    "unit": "2 kg",
+    "multiple":4
+  }]
  },
  {
    "index": 21,
@@ -424,7 +460,19 @@
    "benefits": "",
    "storage_uses": "",
    "other_product_info": "",
-   "variable_weight_policy": ""
+   "variable_weight_policy": "",
+   "units": [ {
+    "unit": "500 g",
+    "multiple":1
+  },
+  {
+    "unit": "1 kg",
+    "multiple":2
+  },
+  {
+    "unit": "2 kg",
+    "multiple":4
+  }]
  },
  {
   "index": 22,

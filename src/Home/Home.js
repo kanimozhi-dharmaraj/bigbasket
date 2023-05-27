@@ -30,7 +30,6 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((data)=>data);
-  console.log(state);
   
   const [productsInCart, setProductsInCart] = useState(state.data.cartItems || {});
   const chooseVariant = (e) => {
@@ -71,7 +70,6 @@ const Home = () => {
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      console.log(newProductsToCart[pIndex][unit]);
       newProductsToCart[pIndex][unit] = {
         quantity: counters[pIndex][unit] || 1
       };
@@ -79,7 +77,6 @@ const Home = () => {
   
     setProductsInCart(newProductsToCart);
     dispatch(UPDATE_ITEMS(newProductsToCart));
-    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
   };
   
 

@@ -30,9 +30,19 @@ const Header = () => {
   const [quantity, setQuantity] = useState(0);
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
-  console.log(state);
-  const [productsInCart, setProductsInCart] = useState([]);
-  const [removeCartItem, setRemoveCartItem] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [productsInCart, setProductsInCart] = useState({});
+  useEffect(() => {
+    if (state.data && state.data.cartItems) {
+      setProductsInCart(state.data.cartItems);
+    }
+  }, [state.data]);
+  useEffect(() => {
+    let cartItems = showItemsInCart();
+    setTotalProductsInCart(cartItems.length)
+    setCartItems(cartItems);
+  }, [productsInCart]);
+
   const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
@@ -84,8 +94,24 @@ const Header = () => {
     setAnchorEl(null);
   };
 
+  const incrementCount = (id, unitIndex) => {
+    let cartItems = JSON.parse(JSON.stringify(productsInCart));
+    cartItems[id][unitIndex]["quantity"] =
+      cartItems[id][unitIndex]["quantity"] + 1;
+    setProductsInCart(cartItems);
+  };
+
+  const decrementCount = (id, unitIndex) => {
+    let cartItems = JSON.parse(JSON.stringify(productsInCart));
+    cartItems[id][unitIndex]["quantity"] = Math.max(
+      cartItems[id][unitIndex]["quantity"] - 1,
+      1
+    );
+    setProductsInCart(cartItems);
+  };
+
   const showItemsInCart = () => {
-    const cartItems = state.data.cartItems;
+    const cartItems = productsInCart;
     const products = [];
 
     for (const pIndex in cartItems) {
@@ -104,6 +130,7 @@ const Header = () => {
       for (const vIndex in cartItems[pIndex]) {
         //Variants
         let variantObject = {
+          unitIndex: vIndex,
           unit: productDetail.units[vIndex].unit,
           quantity: cartItems[pIndex][vIndex]["quantity"],
         };
@@ -111,55 +138,45 @@ const Header = () => {
         products.push({ ...cartProductObject, ...variantObject });
       }
     }
+
     // setTotalProductsInCart(products.length)
     return products;
-  };
-  let incNum = () => {
-    if (quantity < 10) {
-      setQuantity(Number(quantity) + 1);
-    }
-  };
-  let decNum = () => {
-    if (quantity > 0) {
-      setQuantity(quantity - 1);
-    }
   };
   let handleChange = (e) => {
     setQuantity(e.target.value);
   };
   function handleRemove(index) {
     const updatedCartItems = { ...state.data.cartItems };
-  
+
     for (const pIndex in updatedCartItems) {
       if (Array.isArray(updatedCartItems[pIndex])) {
         updatedCartItems[pIndex] = updatedCartItems[pIndex].filter(
           (item) => parseInt(item.index) !== parseInt(index)
         );
-  
+
         if (updatedCartItems[pIndex].length === 0) {
           delete updatedCartItems[pIndex];
         }
       }
     }
-  
+
     dispatch({ type: "UPDATE_CART_ITEMS", payload: updatedCartItems });
-  
+
     // Update local state by filtering out the removed item
     setProductsInCart((prevProducts) =>
-      prevProducts.filter((product) => parseInt(product.index) !== parseInt(index))
+      prevProducts.filter(
+        (product) => parseInt(product.index) !== parseInt(index)
+      )
     );
   }
-  
-  
-    
-  
+
   const calculateSubtotal = () => {
     let subtotal = 0;
-  
+
     for (const product of showItemsInCart()) {
       subtotal += product.sale_price * product.quantity;
     }
-  
+
     return subtotal.toFixed(2);
   };
 
@@ -208,7 +225,7 @@ const Header = () => {
               variant="contained"
               onClick={handleClick}
             >
-              My Basket
+              My Basket {totalProductsInCart}
             </Button>
             <Popover
               id={id}
@@ -221,16 +238,8 @@ const Header = () => {
               }}
             >
               <div>
-                {showItemsInCart().length > 0 ? (
-                  showItemsInCart().map((product) => (
-                    //     <div key={index}>
-                    //       <div><img src={product.image} alt="product-img"></img></div>
-                    //       <div>{product.name}
-                    //       {product.unit}
-                    //        {product.quantity}</div>
-                    //     </div>
-                    //   ))}
-                    // </div>
+                {cartItems.length > 0 ? (
+                  cartItems.map((product) => (
                     <Card
                       key={product.index}
                       sx={{ display: "flex", width: "800px" }}
@@ -260,7 +269,13 @@ const Header = () => {
                                 <button
                                   class="btn btn-outline-primary"
                                   type="button"
-                                  onClick={decNum}
+                                  // onClick={decNum}
+                                  onClick={() =>
+                                    decrementCount(
+                                      product.index,
+                                      product.unitIndex
+                                    )
+                                  }
                                 >
                                   -
                                 </button>
@@ -275,7 +290,13 @@ const Header = () => {
                                 <button
                                   class="btn btn-outline-primary"
                                   type="button"
-                                  onClick={incNum}
+                                  // onClick={incNum}
+                                  onClick={() =>
+                                    incrementCount(
+                                      product.index,
+                                      product.unitIndex
+                                    )
+                                  }
                                 >
                                   +
                                 </button>
@@ -291,47 +312,30 @@ const Header = () => {
                         </Typography>
                         <Button
                           onClick={() => handleRemove(parseInt(product.index))}
-                         
                         >
                           <ClearIcon></ClearIcon>
                         </Button>
-                        {/* <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-                  <IconButton aria-label="previous">
-                    {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
-                  </IconButton>
-                  <IconButton aria-label="play/pause">
-                    <PlayArrowIcon sx={{ height: 38, width: 38 }} />
-                  </IconButton>
-                  <IconButton aria-label="next">
-                    {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
-                  </IconButton>
-                </Box> */}
                       </Box>
                     </Card>
                   ))
                 ) : (
-                  <div>The Cart is Empty</div>
+                  <div>The Cart is Empty </div>
                 )}
               </div>
               <Card>
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
-                <Typography>
-                  **Actual Delivery Charges computed at checkout{" "}
-                </Typography>
-                <Typography>
-                <div>
-                  Sub Total :{calculateSubtotal()}
-                 
-                </div>
-                <div>Delivery Charge : **</div>
-                </Typography>
+                <Box sx={{ display: "flex", flexDirection: "row" }}>
+                  <Typography>
+                    **Actual Delivery Charges computed at checkout{" "}
+                  </Typography>
+                  <Typography>
+                    <div>Sub Total :{calculateSubtotal()}</div>
+                    <div>Delivery Charge : **</div>
+                  </Typography>
                 </Box>
                 <Button>View Basket and Checkout</Button>
-               
               </Card>
             </Popover>
           </div>
-          {/* <ShoppingBasketIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}
         </Toolbar>
       </AppBar>
     </Box>

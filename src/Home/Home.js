@@ -117,13 +117,15 @@ const Home = () => {
                   height="140"
                   image={item.image}
                   alt="green iguana"
-                  sx={{ height: "150px", width: "150px" }}
+                  sx={{ height: "150px", width: "150px", paddingLeft:'60px',paddingTop:"30px"}}
                   onClick={() => showProductDetails(item)}
                 />
+               
                 <img
                   src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
-                  alt="veg-icon"
+                  alt="veg-icon" style={{paddingLeft:"40px"}}
                 ></img>
+                
                 <CardContent>
                   <Typography
                     gutterBottom
@@ -153,7 +155,7 @@ const Home = () => {
                       {item.units.map((unitObj, unitIndex)=>(
                       <MenuItem value={`${item.index}-${unitIndex}`}>
                         {unitObj.unit} - Rs.
-                        {item.sale_price * unitObj.multiple}
+                        {item.sale_price * unitObj.multiple} 
                       </MenuItem>))}
                     </Select>
                   </FormControl>

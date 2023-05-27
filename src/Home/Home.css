@@ -1,3 +1,4 @@
+
 .brandName{
     margin: 5px 0 3px;
     color: #999;
@@ -25,6 +26,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: #666;
+    margin-top: 0px;
 }
 .dropDownBox MenuItem{
     font: 10px ProximaNovaA-Semibold;
@@ -35,7 +37,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color:#F9A544;
 }
+
 .deliveryDetail{
 
 }
@@ -45,10 +49,16 @@
     width: 30px;
     height: 25px;
 }
+.transport:hover{
+   color: #E0E0E0;
+}
 .deliveryTime p{
     font-size: 10px;
     color: #333;
     font-family: ProximaNovaA-Regular;
     margin-bottom: 2px;
     line-height: 15px;
+    display: inline-block;
+    
+    width: 150px;
 }

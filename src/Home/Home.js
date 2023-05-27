@@ -135,7 +135,7 @@ const Home = () => {
                   </Typography>
                   <Typography
                     variant="body2"
-                    color="text.secondary"
+                  
                     className="productName"
                     onClick={() => showProductDetails(item)}
                   >

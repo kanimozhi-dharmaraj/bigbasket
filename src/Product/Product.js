@@ -7,6 +7,8 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import { TextField, Typography } from "@mui/material";
 import "./Product.css";
+import { useDispatch, useSelector } from "react-redux";
+import { UPDATE_ITEMS } from "../Redux/stateSlice";
 
 const Product = () => {
   const [params] = useSearchParams();
@@ -16,6 +18,7 @@ const Product = () => {
   const [marketPrice, setMarketPrice] = useState();
   const [salePrice, setSalePrice] = useState();
   const [discountPercentage, setDiscountPercentage] = useState(0);
+  const [selectedVariants, setSelectedVariants] = useState({});
 
   useEffect(() => {
     setProduct(
@@ -38,13 +41,71 @@ const Product = () => {
       setDiscountPercentage(Math.round(percentage));
     }
   }, [marketPrice, salePrice]);
-  const incrementCount = () => {
-    setCounter(counter + 1);
+  const dispatch = useDispatch();
+  const state = useSelector((data) => data);
+  console.log(state);
+
+  const [productsInCart, setProductsInCart] = useState(
+    state.data.cartItems || {}
+  );
+  const chooseVariant = (e) => {
+    const value = e.target.closest("[data-value]").getAttribute("data-value");
+    const [index, unit] = value.split("-");
+    let existingVariant = selectedVariants;
+    existingVariant[index] = Number(unit);
+    setSelectedVariants(existingVariant);
+  };
+  const incrementCount = (id) => {
+    setCounter((prevCounters) => {
+      const newCounters = { ...prevCounters };
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] =
+        (newCounters[id][selectedVariant] || 0) + 1;
+
+      return newCounters;
+    });
   };
 
-  const decrementCount = () => {
-    setCounter(() => Math.max(counter - 1, 0));
+  const decrementCount = (id) => {
+    setCounter((prevCounters) => {
+      const newCounters = { ...prevCounters };
+      const selectedVariant = selectedVariants[id] || 0;
+
+      newCounters[id] = newCounters[id] || {};
+      newCounters[id][selectedVariant] = Math.max(
+        (newCounters[id][selectedVariant] || 0) - 1,
+        0
+      );
+      return newCounters;
+    });
   };
+
+  const updateProductsInCart = () => {
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
+
+    for (const pIndex in counter) {
+      const unit = selectedVariants[pIndex] || 0;
+      newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
+      console.log(newProductsToCart[pIndex][unit]);
+      newProductsToCart[pIndex][unit] = {
+        quantity: counter[pIndex][unit] || 1,
+      };
+    }
+
+    setProductsInCart(newProductsToCart);
+    dispatch(UPDATE_ITEMS(newProductsToCart));
+    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
+  };
+
+  // const incrementCount = () => {
+  //   setCounter(counter + 1);
+  // };
+
+  // const decrementCount = () => {
+  //   setCounter(() => Math.max(counter - 1, 0));
+  // };
   const handleClickedWeight = (e) => {
     const clickedWeight = e.target
       .closest("[data-value]")
@@ -63,6 +124,9 @@ const Product = () => {
     setMarketPrice(clickedMarketPrice);
     setSalePrice(clickedSalePrice);
   };
+  useEffect(() => {
+    updateProductsInCart();
+  }, [counter]);
 
   // useEffect(() => {
   //    const cartItem = {
@@ -127,7 +191,7 @@ const Product = () => {
                     />
                     <button
                       className="basketBtn"
-                      onClick={() => incrementCount()}
+                      onClick={() => incrementCount(product.index)}
                     >
                       ADD TO BASKET
                     </button>
@@ -138,7 +202,7 @@ const Product = () => {
                     <button
                       type="button"
                       className="btn btn-warning"
-                      onClick={() => decrementCount()}
+                      onClick={() => decrementCount(product.index)}
                     >
                       -
                     </button>
@@ -152,7 +216,7 @@ const Product = () => {
                     <button
                       type="button"
                       className="btn btn-warning"
-                      onClick={() => incrementCount()}
+                      onClick={() => incrementCount(product.index)}
                     >
                       +
                     </button>
@@ -173,7 +237,9 @@ const Product = () => {
                     width="25px"
                     alt="transport"
                   ></img>
-                  <span className="deliveryTime">Standard Delivery: Tomorrow 9:00AM - 1:30PM</span>
+                  <span className="deliveryTime">
+                    Standard Delivery: Tomorrow 9:00AM - 1:30PM
+                  </span>
                 </Typography>
                 <div>
                   {product.units && product.units.length > 0
@@ -182,14 +248,14 @@ const Product = () => {
                           className={`optionBox ${
                             clickedElement === item.unit ? "clickedWeight" : ""
                           }`}
-                          data-value={item.unit}
+                          data-value={(`${product.index}-${i}`)}
                           data-sale-price={(
                             product.sale_price * item.multiple
                           ).toFixed(2)}
                           data-market-price={(
                             product.market_price * item.multiple
                           ).toFixed(2)}
-                          onClick={(e) => handleClickedWeight(e)}
+                          onClick={(e) => chooseVariant(e)}
                         >
                           <div className="weight">
                             <div>{item.unit}</div>
@@ -256,35 +322,35 @@ const Product = () => {
         <CardContent>
           {product && (
             <>
-              <h1>
+              <h1 className="headingStyle">
                 {product.brand} {product.product}
               </h1>
               <Typography>
-                <h6>About the Product</h6>
-                <ul>
+                <h6 className="subHeading">About the Product</h6>
+                <ul className="content">
                   {product.description.split("\n").map((line, index) => (
                     <li key={index}>{line}</li>
                   ))}
                 </ul>
-                <h6>Benefits</h6>
-                <ul>
+                <h6 className="subHeading">Benefits</h6>
+                <ul className="content">
                   {product.benefits.split("\n").map((line, index) => (
                     <li key={index}>{line}</li>
                   ))}
                 </ul>
-                <h6>Storage and Uses</h6>
-                <ul>
+                <h6 className="subHeading">Storage and Uses</h6>
+                <ul className="content">
                   {product.storage_uses.split("\n").map((line, index) => (
                     <li key={index}>{line}</li>
                   ))}
                 </ul>
-                <h6>Other Product Info</h6>
+                <h6 className="subHeading">Other Product Info</h6>
+                    <div className="content"> {product.other_product_info}</div>
+              
 
-                {product.other_product_info}
-
-                <h6>Variable Weight Policy</h6>
-
-                {product.variable_weight_policy}
+                <h6 className="subHeading">Variable Weight Policy</h6>
+                    <div className="content"> {product.variable_weight_policy}</div>
+               
               </Typography>
             </>
           )}

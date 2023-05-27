@@ -109,3 +109,21 @@
     border-radius: 0 3px 3px 0;
     margin: -1px -1px -1px 0
 }
+.headingStyle{
+    font-size: 1.8rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+    margin: 0;
+    font-weight: 400;
+    color: #222;
+}
+.subHeading{
+    font-size: 1.0rem;
+    cursor: pointer;
+    color: #444;
+}
+.content{
+    color: #666;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}

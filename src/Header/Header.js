@@ -145,29 +145,13 @@ const Header = () => {
   let handleChange = (e) => {
     setQuantity(e.target.value);
   };
-  function handleRemove(index) {
-    const updatedCartItems = { ...state.data.cartItems };
-
-    for (const pIndex in updatedCartItems) {
-      if (Array.isArray(updatedCartItems[pIndex])) {
-        updatedCartItems[pIndex] = updatedCartItems[pIndex].filter(
-          (item) => parseInt(item.index) !== parseInt(index)
-        );
-
-        if (updatedCartItems[pIndex].length === 0) {
-          delete updatedCartItems[pIndex];
-        }
-      }
+  function removeCartItem(pIndex, unitIndex) {
+    let oldProductsInCart = JSON.parse(JSON.stringify(productsInCart));
+    delete oldProductsInCart[pIndex][unitIndex];
+    if(Object.keys(oldProductsInCart[pIndex]).length === 0) {
+      delete oldProductsInCart[pIndex];
     }
-
-    dispatch({ type: "UPDATE_CART_ITEMS", payload: updatedCartItems });
-
-    // Update local state by filtering out the removed item
-    setProductsInCart((prevProducts) =>
-      prevProducts.filter(
-        (product) => parseInt(product.index) !== parseInt(index)
-      )
-    );
+    setProductsInCart(oldProductsInCart);
   }
 
   const calculateSubtotal = () => {
@@ -311,7 +295,10 @@ const Header = () => {
                           </div>
                         </Typography>
                         <Button
-                          onClick={() => handleRemove(parseInt(product.index))}
+                          onClick={() => removeCartItem(
+                            product.index,
+                            product.unitIndex
+                          )}
                         >
                           <ClearIcon></ClearIcon>
                         </Button>

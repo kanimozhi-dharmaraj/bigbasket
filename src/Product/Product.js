@@ -13,12 +13,13 @@ import { UPDATE_ITEMS } from "../Redux/stateSlice";
 const Product = () => {
   const [params] = useSearchParams();
   const [product, setProduct] = useState(null);
-  const [counter, setCounter] = useState(0);
+  const [counters, setCounters] = useState({});
   const [clickedElement, setClickedElement] = useState(null);
   const [marketPrice, setMarketPrice] = useState();
   const [salePrice, setSalePrice] = useState();
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [selectedVariants, setSelectedVariants] = useState({});
+  const [selectedVariantQuantity, setSelectedVariantQuantity] = useState(0);
 
   useEffect(() => {
     setProduct(
@@ -43,7 +44,6 @@ const Product = () => {
   }, [marketPrice, salePrice]);
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
-  console.log(state);
 
   const [productsInCart, setProductsInCart] = useState(
     state.data.cartItems || {}
@@ -53,88 +53,60 @@ const Product = () => {
     const [index, unit] = value.split("-");
     let existingVariant = selectedVariants;
     existingVariant[index] = Number(unit);
+
+    if(productsInCart[index][unit] === undefined) {
+      setSelectedVariantQuantity(0);
+    } else {
+      setSelectedVariantQuantity(productsInCart[index][unit]['quantity'])
+    }
+
     setSelectedVariants(existingVariant);
+    setClickedElement(product.units[unit].unit);
   };
   const incrementCount = (id) => {
-    setCounter((prevCounters) => {
+    setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
       const selectedVariant = selectedVariants[id] || 0;
 
       newCounters[id] = newCounters[id] || {};
-      newCounters[id][selectedVariant] =
-        (newCounters[id][selectedVariant] || 0) + 1;
-
+      newCounters[id][selectedVariant] = (newCounters[id][selectedVariant] || 0) + 1;
+      setSelectedVariantQuantity(newCounters[id][selectedVariant]);
+      
       return newCounters;
     });
   };
 
   const decrementCount = (id) => {
-    setCounter((prevCounters) => {
+    setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
       const selectedVariant = selectedVariants[id] || 0;
 
       newCounters[id] = newCounters[id] || {};
-      newCounters[id][selectedVariant] = Math.max(
-        (newCounters[id][selectedVariant] || 0) - 1,
-        0
-      );
+      newCounters[id][selectedVariant] = Math.max((newCounters[id][selectedVariant] || 0) - 1, 0);
+      setSelectedVariantQuantity(newCounters[id][selectedVariant]);
+
       return newCounters;
     });
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
-
-    for (const pIndex in counter) {
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
+    
+    for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      console.log(newProductsToCart[pIndex][unit]);
       newProductsToCart[pIndex][unit] = {
-        quantity: counter[pIndex][unit] || 1,
+        quantity: counters[pIndex][unit] || 1
       };
     }
-
+  
     setProductsInCart(newProductsToCart);
     dispatch(UPDATE_ITEMS(newProductsToCart));
-    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
   };
 
-  // const incrementCount = () => {
-  //   setCounter(counter + 1);
-  // };
-
-  // const decrementCount = () => {
-  //   setCounter(() => Math.max(counter - 1, 0));
-  // };
-  const handleClickedWeight = (e) => {
-    const clickedWeight = e.target
-      .closest("[data-value]")
-      .getAttribute("data-value");
-    const clickedMarketPrice = e.target
-      .closest("[data-value]")
-      .getAttribute("data-market-price");
-    console.log(clickedMarketPrice);
-    const clickedSalePrice = e.target
-      .closest("[data-value]")
-      .getAttribute("data-sale-price");
-    console.log(clickedSalePrice);
-    // console.log(e.target.value)
-    setClickedElement(clickedWeight);
-
-    setMarketPrice(clickedMarketPrice);
-    setSalePrice(clickedSalePrice);
-  };
   useEffect(() => {
     updateProductsInCart();
-  }, [counter]);
-
-  // useEffect(() => {
-  //    const cartItem = {
-  //     index: product.index,
-  //     quantity: counter,
-  //     varient: clickedElement
-  //    }
-  // }, [counter])
+  }, [counters]);
 
   return (
     <>
@@ -176,7 +148,7 @@ const Product = () => {
                 </div>
                 <div className="info">(Inclusive of all taxes)</div>
 
-                {counter === 0 ? (
+                {selectedVariantQuantity === 0 ? (
                   <div>
                     <TextField
                       sx={{
@@ -209,8 +181,8 @@ const Product = () => {
                     <input
                       type="number"
                       min="1"
-                      defaultValue={counter}
-                      value={counter}
+                      defaultValue={selectedVariantQuantity || 0}
+                      value={selectedVariantQuantity || 0}
                       className="form-control"
                     />
                     <button
@@ -248,7 +220,7 @@ const Product = () => {
                           className={`optionBox ${
                             clickedElement === item.unit ? "clickedWeight" : ""
                           }`}
-                          data-value={(`${product.index}-${i}`)}
+                          data-value={`${product.index}-${i}`}
                           data-sale-price={(
                             product.sale_price * item.multiple
                           ).toFixed(2)}
@@ -282,36 +254,6 @@ const Product = () => {
                         </div>
                       ))
                     : ""}
-                  {/* <div className={`optionBox ${clickedElement === '1kg' ? 'clickedWeight' : ''}`} data-value="1kg" onClick={(e)=>handleClickedWeight(e)}>
-                    <div className="weight">
-                      <div>1kg</div>
-                    </div>
-                    <div className="rate">
-                      <div>
-                        <span> Rs.{2*product.sale_price}</span>
-                        <span style={{ textDecoration: "line-through" }}>
-                          Rs.  {2*product.market_price}
-                        </span>
-                        <span>Discount</span>
-                      </div>
-                    </div>
-                    <div className="selectOption"></div>
-                  </div>
-                  <div className={`optionBox ${clickedElement === '2kg' ? 'clickedWeight' : ''}`} data-value="2kg" onClick={(e)=>handleClickedWeight(e)}>
-                    <div className="weight">
-                      <div>2kg</div>
-                    </div>
-                    <div className="rate">
-                      <div>
-                        <span> Rs.{4*product.sale_price}</span>
-                        <span style={{ textDecoration: "line-through" }}>
-                          Rs. {4*product.market_price}
-                        </span>
-                        <span>Discount</span>
-                      </div>
-                    </div>
-                    <div className="selectOption"></div>
-                  </div> */}
                 </div>
               </>
             )}
@@ -345,12 +287,16 @@ const Product = () => {
                   ))}
                 </ul>
                 <h6 className="subHeading">Other Product Info</h6>
-                    <div className="content"> {product.other_product_info}</div>
-              
+                <div className="content"> {product.other_product_info}</div>
+                <div className="content"> {product.other_product_info}</div>
+
+                <div className="content"> {product.other_product_info}</div>
 
                 <h6 className="subHeading">Variable Weight Policy</h6>
-                    <div className="content"> {product.variable_weight_policy}</div>
-               
+                <div className="content"> {product.variable_weight_policy}</div>
+                <div className="content"> {product.variable_weight_policy}</div>
+
+                <div className="content"> {product.variable_weight_policy}</div>
               </Typography>
             </>
           )}

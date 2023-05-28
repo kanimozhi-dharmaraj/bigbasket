@@ -33,7 +33,6 @@ const Home = () => {
   
   const [productsInCart, setProductsInCart] = useState(state.data.cartItems || {});
   const chooseVariant = (e) => {
-    // 1st {1: 0, 2:3}
     const value = e.target.value;
     const [index, unit] = value.split('-');
     let existingVariant = selectedVariants;

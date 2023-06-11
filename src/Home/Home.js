@@ -25,11 +25,11 @@ const Home = () => {
   const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
-  
-  
+ 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((data)=>data);
+ 
   
   const [productsInCart, setProductsInCart] = useState(state.data.cartItems || {});
   const chooseVariant = (e) => {
@@ -108,9 +108,9 @@ const Home = () => {
           <Grid item xs={12} sm={6} md={3} key={i}>
             <Card sx={{ maxWidth: 345 }}>
               <CardActionArea>
+                <div className="offer-box">GET {Math.round(((item.market_price-item.sale_price)/(item.market_price)) * 100)} % OFF</div>
                 <CardMedia
                   component="img"
-                  height="140"
                   image={item.image}
                   alt="green iguana"
                   sx={{ height: "150px", width: "150px", paddingLeft:'60px',paddingTop:"30px"}}
@@ -119,26 +119,19 @@ const Home = () => {
                
                 <img
                   src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
-                  alt="veg-icon" style={{paddingLeft:"40px"}}
+                  alt="veg-icon" style={{paddingLeft:"20px"}}
                 ></img>
                 
                 <CardContent>
-                  <Typography
-                    gutterBottom
-                    variant="body"
-                    component="div"
-                    className="brandName"
-                  >
-                    {item.brand}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                  
+                  <div className="brandName">{item.brand}</div>
+                  <div
+                   
                     className="productName"
                     onClick={() => showProductDetails(item)}
                   >
                     {item.product}
-                  </Typography>
+                  </div>
+                  
                   <FormControl fullWidth>
                     <Select
                       labelId={`demo-simple-select-label-${item.index}`}
@@ -147,21 +140,23 @@ const Home = () => {
                       onChange={(e) => chooseVariant(e)}
                       defaultValue={`${item.index}-0`}
                       className="dropDownBox"
+                      sx={{color : "#666666"}}
                     >
                       {item.units.map((unitObj, unitIndex)=>(
-                      <MenuItem value={`${item.index}-${unitIndex}`}>
+                      <MenuItem value={`${item.index}-${unitIndex}`}  sx={{color : "#666666"}} >
                         {unitObj.unit} - Rs.
                         {item.sale_price * unitObj.multiple} 
                       </MenuItem>))}
                     </Select>
                   </FormControl>
-                  <Typography>
-                    MRP{" "}
-                    <span style={{ textDecoration: "line-through" }}>
-                      Rs. {prices[i]}
+                  <div className="basket-details">
+                  <div>
+                    <span className="mrpPriceStyle">MRP{" "}
+                    <span style={{ textDecoration: "line-through" }}></span>
+                     Rs. {prices[i]} 
                     </span>{" "}
-                    Rs.{selectedPrices[i]}
-                  </Typography>
+                    <span className="salePriceStyle">Rs.{selectedPrices[i]}</span>
+                  </div>
                   <Typography className="DeliveryDetail">
                     <img
                       src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
@@ -219,6 +214,7 @@ const Home = () => {
                       </button>
                     </div>
                   )}
+                  </div>
                 </CardContent>
               </CardActionArea>
             </Card>

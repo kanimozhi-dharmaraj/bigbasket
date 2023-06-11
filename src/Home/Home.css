@@ -1,43 +1,35 @@
 
 .brandName{
-    margin: 5px 0 3px;
+    text-decoration: none;
     color: #999;
     font: 11px ProximaNovaA-Regular;
+    margin-bottom: 5px;
 }
 .productName{
     color: black;
-    font: 13px ProximaNovaA-Regular;
+    font: 14px ProximaNovaA-Regular;
+    margin-bottom: 20px;
 }
 .productName:hover{
-    color: lightgreen;
+    color: #337ab7;
 }
 .dropDownBox{
-    padding: 0 0 0 8px;
-    border-radius: 0;
-    line-height: 20px;
-    text-align: left;
+   
     background-color: #fff;
-    box-shadow: none;
+    
     width: 100%;
-    font-size: 12px;
+    font-size: 14px;
     font-family: ProximaNovaA-Semibold;
     height: 22px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #666;
-    margin-top: 0px;
+    
 }
-.dropDownBox MenuItem{
-    font: 10px ProximaNovaA-Semibold;
-    border-bottom-color: #004c72;
-    color: #59595b;
-    border-left: 5px solid #fff;
-    padding-left: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color:#F9A544;
+.mrpPriceStyle{
+    text-decoration: line-through;
+    font: 10px ProximaNovaA-Regular;
+    color: #6e6e71;
+}
+.salePriceStyle{
+    color: #231f20;
 }
 
 .deliveryDetail{
@@ -61,4 +53,17 @@
     display: inline-block;
     
     width: 150px;
+}
+.offer-box{
+    color: #ba5253;
+    text-align: right;
+    box-shadow: #fff;
+    font: 12px ProximaNovaA-Semibold;
+    line-height: 22px;
+    background-color: #fff;
+    border: 1px solid #f2f2f2;
+    margin : 5px;
+}
+.basket-details{
+    background-color: #F4F3F2;
 }

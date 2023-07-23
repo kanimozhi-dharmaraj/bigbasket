@@ -32,6 +32,7 @@ const Header = () => {
   const state = useSelector((data) => data);
   const [cartItems, setCartItems] = useState([]);
   const [productsInCart, setProductsInCart] = useState({});
+  
   useEffect(() => {
     if (state.data && state.data.cartItems) {
       setProductsInCart(state.data.cartItems);
@@ -153,6 +154,13 @@ const Header = () => {
     }
     setProductsInCart(oldProductsInCart);
   }
+
+  useEffect(() => {
+    localStorage.setItem(
+      "productState",
+      JSON.stringify(productsInCart)
+    )
+  }, [productsInCart]);
 
   const calculateSubtotal = () => {
     let subtotal = 0;

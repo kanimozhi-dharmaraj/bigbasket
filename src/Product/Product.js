@@ -20,6 +20,19 @@ const Product = () => {
   const [discountPercentage, setDiscountPercentage] = useState(0);
   const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedVariantQuantity, setSelectedVariantQuantity] = useState(0);
+  const localStorageKey = "productState";
+
+  const loadCartItemsFromStorage = () => {
+    try {
+      const serializedState = localStorage.getItem(localStorageKey);
+      if (serializedState === null) {
+        return undefined;
+      }
+      return JSON.parse(serializedState);
+    } catch (error) {
+      return undefined;
+    }
+  };
 
   useEffect(() => {
     setProduct(
@@ -45,16 +58,14 @@ const Product = () => {
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
 
-  const [productsInCart, setProductsInCart] = useState(
-    state.data.cartItems || {}
-  );
+  const [productsInCart, setProductsInCart] = useState(loadCartItemsFromStorage() || state.data.cartItems || {});
   const chooseVariant = (e) => {
     const value = e.target.closest("[data-value]").getAttribute("data-value");
     const [index, unit] = value.split("-");
     let existingVariant = selectedVariants;
     existingVariant[index] = Number(unit);
 
-    if(productsInCart[index][unit] === undefined) {
+    if (productsInCart[index][unit] === undefined) {
       setSelectedVariantQuantity(0);
     } else {
       setSelectedVariantQuantity(productsInCart[index][unit]['quantity'])
@@ -71,7 +82,7 @@ const Product = () => {
       newCounters[id] = newCounters[id] || {};
       newCounters[id][selectedVariant] = (newCounters[id][selectedVariant] || 0) + 1;
       setSelectedVariantQuantity(newCounters[id][selectedVariant]);
-      
+
       return newCounters;
     });
   };
@@ -91,7 +102,7 @@ const Product = () => {
 
   const updateProductsInCart = () => {
     const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
-    
+
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
@@ -99,14 +110,23 @@ const Product = () => {
         quantity: counters[pIndex][unit] || 1
       };
     }
-  
-    setProductsInCart(newProductsToCart);
+
     dispatch(UPDATE_ITEMS(newProductsToCart));
+    if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
+      return;
+    }
+
+    setProductsInCart(newProductsToCart);
+
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify(newProductsToCart)
+    )
   };
 
   useEffect(() => {
     updateProductsInCart();
-  }, [counters]);
+  }, [counters, productsInCart]);
 
   return (
     <>
@@ -216,43 +236,42 @@ const Product = () => {
                 <div>
                   {product.units && product.units.length > 0
                     ? product.units.map((item, i) => (
-                        <div
-                          className={`optionBox ${
-                            clickedElement === item.unit ? "clickedWeight" : ""
+                      <div
+                        className={`optionBox ${clickedElement === item.unit ? "clickedWeight" : ""
                           }`}
-                          data-value={`${product.index}-${i}`}
-                          data-sale-price={(
-                            product.sale_price * item.multiple
-                          ).toFixed(2)}
-                          data-market-price={(
-                            product.market_price * item.multiple
-                          ).toFixed(2)}
-                          onClick={(e) => chooseVariant(e)}
-                        >
-                          <div className="weight">
-                            <div>{item.unit}</div>
-                          </div>
-                          <div className="rate">
-                            <div>
-                              <span>
-                                {" "}
-                                Rs.
-                                {(product.sale_price * item.multiple).toFixed(
-                                  2
-                                )}
-                              </span>
-                              <span style={{ textDecoration: "line-through" }}>
-                                Rs.{" "}
-                                {(product.market_price * item.multiple).toFixed(
-                                  2
-                                )}
-                              </span>
-                              <span>{discountPercentage} %</span>
-                            </div>
-                          </div>
-                          <div className="selectOption"></div>
+                        data-value={`${product.index}-${i}`}
+                        data-sale-price={(
+                          product.sale_price * item.multiple
+                        ).toFixed(2)}
+                        data-market-price={(
+                          product.market_price * item.multiple
+                        ).toFixed(2)}
+                        onClick={(e) => chooseVariant(e)}
+                      >
+                        <div className="weight">
+                          <div>{item.unit}</div>
                         </div>
-                      ))
+                        <div className="rate">
+                          <div>
+                            <span>
+                              {" "}
+                              Rs.
+                              {(product.sale_price * item.multiple).toFixed(
+                                2
+                              )}
+                            </span>
+                            <span style={{ textDecoration: "line-through" }}>
+                              Rs.{" "}
+                              {(product.market_price * item.multiple).toFixed(
+                                2
+                              )}
+                            </span>
+                            <span>{discountPercentage} %</span>
+                          </div>
+                        </div>
+                        <div className="selectOption"></div>
+                      </div>
+                    ))
                     : ""}
                 </div>
               </>

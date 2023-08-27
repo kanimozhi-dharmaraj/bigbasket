@@ -25,13 +25,25 @@ const Home = () => {
   const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
- 
+  const localStorageKey = "productState";
+
+  const loadCartItemsFromStorage = () => {
+    try {
+      const serializedState = localStorage.getItem(localStorageKey);
+      if (serializedState === null) {
+        return undefined;
+      }
+      return JSON.parse(serializedState);
+    } catch (error) {
+      return undefined;
+    }
+  };
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((data)=>data);
  
-  
-  const [productsInCart, setProductsInCart] = useState(state.data.cartItems || {});
+  const [productsInCart, setProductsInCart] = useState(loadCartItemsFromStorage() || state.data.cartItems || {});
   const chooseVariant = (e) => {
     const value = e.target.value;
     const [index, unit] = value.split('-');
@@ -64,8 +76,8 @@ const Home = () => {
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
-    
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
+
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
@@ -73,9 +85,18 @@ const Home = () => {
         quantity: counters[pIndex][unit] || 1
       };
     }
-  
-    setProductsInCart(newProductsToCart);
+
     dispatch(UPDATE_ITEMS(newProductsToCart));
+    if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
+      return;
+    }
+
+    setProductsInCart(newProductsToCart);
+
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify(newProductsToCart)
+    )
   };
   
 
@@ -94,6 +115,11 @@ const Home = () => {
   useEffect(() => {
     updateProductsInCart();
   }, [counters]);
+
+  //Update cart quantities based on productsInCart
+  useEffect(() => {
+    
+  }, [productsInCart]);
 
   return (
     <div>

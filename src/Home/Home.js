@@ -120,13 +120,14 @@ const Home = () => {
   useEffect(() => {
     
   }, [productsInCart]);
+  
 
   return (
     <div>
       <Box sx={{ overflow: "hidden" }}>
         <img
           src="https://www.bigbasket.com/media/uploads/banner_images/2305152-bbpl-staples_460_Bangalore.jpg"
-          alt="banner"
+          alt="banner" class="bannerImage"
         />
       </Box>
       <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -201,9 +202,9 @@ const Home = () => {
                     <div>
                       <TextField
                         id={`quantity-${item.index}`}
-                        sx={{ m: 1, width: "10ch" }}
+                        sx={{ m: 1, width: "10ch" ,height: "0em",marginTop:"-25px"}}
                         variant="filled"
-                        placeholder="1"
+                        placeholder="Qty 1"
                       />
                       <Button
                         variant="contained"
@@ -256,15 +257,15 @@ const Home = () => {
           .slice(8, 12)
           .map((item, i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Card sx={{ maxWidth: 345 }}>
+              <Card sx={{ maxWidth: 200 }}>
                 <CardActionArea>
                   <CardMedia
                     component="img"
                     height="171"
-                    width="229"
+                    width="100"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "150px" }}
+                    sx={{ height: "150px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>
@@ -279,14 +280,14 @@ const Home = () => {
           .filter((product) => product.category === "Beverages")
           .map((item, i) => (
             <Grid item xs={12} sm={6} md={2} key={i}>
-              <Card sx={{ maxWidth: 345 }}>
+              <Card sx={{ maxWidth: 200 }}>
                 <CardActionArea>
                   <CardMedia
                     component="img"
                     height="140"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "150px" }}
+                    sx={{ height: "150px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>
@@ -305,14 +306,14 @@ const Home = () => {
           .slice(1, 5)
           .map((item, i) => (
             <Grid item xs={12} sm={6} md={3} key={i}>
-              <Card sx={{ maxWidth: 345 }}>
+              <Card sx={{ maxWidth: 200 }}>
                 <CardActionArea>
                   <CardMedia
                     component="img"
                     height="140"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "150px" }}
+                    sx={{ height: "150px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>

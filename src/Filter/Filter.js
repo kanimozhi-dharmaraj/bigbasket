@@ -541,7 +541,7 @@ const Filter = () => {
                       height="140"
                       image={item.image}
                       alt="green iguana"
-                      sx={{ height: "150px", width: "150px" }}
+                      sx={{ height: "150px", width: "200px" }}
                       onClick={() => showProductDetails(item)}
                     />
                     <img
@@ -614,7 +614,7 @@ const Filter = () => {
                         <div>
                           <TextField
                             id={`quantity-${item.index}`}
-                            sx={{ m: 1, width: "10ch" }}
+                            sx={{ m: 1, width: "10ch" ,margin: "0.5rem"}}
                             variant="filled"
                             placeholder="1"
                           />

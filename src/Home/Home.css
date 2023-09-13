@@ -67,3 +67,8 @@
 .basket-details{
     background-color: #F4F3F2;
 }
+@media only screen and (max-width: 992px) {
+    .bannerImage {
+      width: 100%;
+    }
+  }

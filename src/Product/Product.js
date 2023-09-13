@@ -174,10 +174,10 @@ const Product = () => {
                       sx={{
                         width: "40px",
                         border: "1px solid #c8c8c8",
-                        borderRadius: "3px",
+                       
                         textAlign: "center",
                         color: "#666",
-                        height: "40px",
+                        
                       }}
                       placeholder="1"
                     />

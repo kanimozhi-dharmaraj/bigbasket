@@ -194,7 +194,7 @@ const Header = () => {
             <PersonOutlineOutlinedIcon sx={{ marginLeft: "10px" }} />
             <Typography>Login/Sign Up</Typography>
           </div>
-          <a href="/">
+          <a href="/Home">
             <img
               src="https://www.bbassets.com/static/v2662/custPage/build/content/img/bb_logo.png"
               alt="bb"

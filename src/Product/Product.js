@@ -41,14 +41,14 @@ const Product = () => {
   }, [params]);
   useEffect(() => {
     if (product && product.units && product.units.length > 0) {
-      const minQuantity = product.units[0].unit;
-      const minMarketPrice = product.market_price;
-      const minSalePrice = product.sale_price;
+      const minQuantity = product.units[selectedVariants[product.index] || 0].unit;
+      const minMarketPrice = product.market_price * product.units[selectedVariants[product.index]].multiple;
+      const minSalePrice = product.sale_price * product.units[selectedVariants[product.index]].multiple;
       setClickedElement(minQuantity);
       setMarketPrice(minMarketPrice);
       setSalePrice(minSalePrice);
     }
-  }, [product]);
+  }, [product, clickedElement]);
   useEffect(() => {
     if (marketPrice && salePrice) {
       const percentage = ((marketPrice - salePrice) / marketPrice) * 100;

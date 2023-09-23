@@ -20,10 +20,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { UPDATE_ITEMS } from "../Redux/stateSlice";
 
 const Home = () => {
-  //   const [items, setItems] = useState([]);
-  const [prices, setPrices] = useState([]);
+  const [items, setItems] = useState([]);
+  const [marketPrices, setMarketPrices] = useState([]);
+  const [salePrices, setSalePrices] = useState([]);
   const [selectedVariants, setSelectedVariants] = useState({});
-  const [selectedPrices, setSelectedPrices] = useState([]);
   const [counters, setCounters] = useState({});
   const localStorageKey = "productState";
 
@@ -47,10 +47,9 @@ const Home = () => {
   const chooseVariant = (e) => {
     const value = e.target.value;
     const [index, unit] = value.split('-');
-    let existingVariant = selectedVariants;
-    existingVariant[index] = Number(unit);
-    console.log(existingVariant)
-    setSelectedVariants(existingVariant);
+    let newVariants = selectedVariants;
+    newVariants[index] = Number(unit);
+    setSelectedVariants(newVariants)
   };
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
@@ -113,25 +112,49 @@ const Home = () => {
   };
 
   useEffect(() => {
+    setItems(Products);
+  }, [Products]);
+
+  useEffect(() => {
     updateProductsInCart();
   }, [counters]);
 
-  //Update cart quantities based on productsInCart
+  // useEffect(() => {
+  //   //alert('Helll')
+  //   let salePriceArray = items.map((product, i) => product.sale_price * (product.units? product.units[selectedVariants[i] || 0].multiple : 1));
+  //   let marketPriceArray = items.map((product, i) => product.market_price * (product.units? product.units[selectedVariants[i] || 0].multiple : 1));
+  //   console.log(salePriceArray)
+  //   console.log(marketPriceArray)
+  //   setSalePrices(salePriceArray);
+  //   setMarketPrices(marketPriceArray);
+  // }, [items, selectedVariants]);
   useEffect(() => {
+    // Calculate the new market prices based on the selected variants
+    const newMarketPrices = items.map((product, i) =>
+      product.market_price * (product.units ? product.units[selectedVariants[i] || 0].multiple : 1)
+    );
+    setMarketPrices(newMarketPrices);
+  }, [selectedVariants, items]);
+
+  useEffect(() => {
+    // Calculate the new sale prices based on the selected variants
+    const newSalePrices = items.map((product, i) =>
+      product.sale_price * (product.units ? product.units[selectedVariants[i] || 0].multiple : 1)
+    );
+    setSalePrices(newSalePrices);
+  }, [selectedVariants, items]);
     
-  }, [productsInCart]);
-  
 
   return (
     <div>
       <Box sx={{ overflow: "hidden" }}>
         <img
           src="https://www.bigbasket.com/media/uploads/banner_images/2305152-bbpl-staples_460_Bangalore.jpg"
-          alt="banner" class="bannerImage"
+          alt="banner" className="bannerImage"
         />
       </Box>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {Products.slice(0, 8).map((item, i) => (
+        {items.slice(0, 8).map((item, i) => (
           <Grid item xs={12} sm={6} md={3} key={i}>
             <Card sx={{ maxWidth: 345 }}>
               <CardActionArea>
@@ -163,7 +186,6 @@ const Home = () => {
                     <Select
                       labelId={`demo-simple-select-label-${item.index}`}
                       id={`demo-simple-select-${item.index}`}
-                      value={prices[i]}
                       onChange={(e) => chooseVariant(e)}
                       defaultValue={`${item.index}-0`}
                       className="dropDownBox"
@@ -180,9 +202,9 @@ const Home = () => {
                   <div>
                     <span className="mrpPriceStyle">MRP{" "}
                     <span style={{ textDecoration: "line-through" }}></span>
-                     Rs. {prices[i]} 
+                     Rs. {marketPrices[i]} 
                     </span>{" "}
-                    <span className="salePriceStyle">Rs.{selectedPrices[i]}</span>
+                    <span className="salePriceStyle">Rs.{salePrices[i]} </span>
                   </div>
                   <Typography className="DeliveryDetail">
                     <img
@@ -251,7 +273,7 @@ const Home = () => {
       <h2 style={{ textAlign: "center" }}>Fruits and Vegetables</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {Products.filter(
+        {items.filter(
           (product) => product.category === "Fruits & Vegetables"
         )
           .slice(8, 12)
@@ -276,10 +298,10 @@ const Home = () => {
       <h2 style={{ textAlign: "center" }}>Beverages</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 2 }}>
-        {Products.slice(10, 16)
+        {items.slice(10, 16)
           .filter((product) => product.category === "Beverages")
           .map((item, i) => (
-            <Grid item xs={12} sm={6} md={2} key={i}>
+            <Grid item xs={12} sm={6} md={2}>
               <Card sx={{ maxWidth: 200 }}>
                 <CardActionArea>
                   <CardMedia
@@ -298,14 +320,14 @@ const Home = () => {
       <h2 style={{ textAlign: "center" }}>Snack Store</h2>
       <hr></hr>
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {Products.filter(
+        {items.filter(
           (product) =>
             product.category === "Gourmet & World Food" ||
             product.category === "Snacks & Branded Foods"
         )
           .slice(1, 5)
           .map((item, i) => (
-            <Grid item xs={12} sm={6} md={3} key={i}>
+            <Grid item xs={12} sm={6} md={3}>
               <Card sx={{ maxWidth: 200 }}>
                 <CardActionArea>
                   <CardMedia

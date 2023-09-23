@@ -236,7 +236,7 @@ const Header = () => {
                   cartItems.map((product) => (
                     <Card
                       key={product.index}
-                      sx={{ display: "flex", width: "800px" }}
+                      sx={{ display: "flex", width: "1000px" }}
                     >
                       <CardMedia
                         component="img"

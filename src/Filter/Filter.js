@@ -40,14 +40,24 @@ const Filter = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const localStorageKey = "productState";
 
   const dispatch = useDispatch();
   const state = useSelector((data) => data);
 
-  console.log(state);
-  const [productsInCart, setProductsInCart] = useState(
-    state.data.cartItems || {}
-  );
+  const loadCartItemsFromStorage = () => {
+    try {
+      const serializedState = localStorage.getItem(localStorageKey);
+      if (serializedState === null) {
+        return undefined;
+      }
+      return JSON.parse(serializedState);
+    } catch (error) {
+      return undefined;
+    }
+  };
+  const [productsInCart, setProductsInCart] = useState(loadCartItemsFromStorage() || state.data.cartItems || {});
+
   // useEffect(() => {
   //     setProduct(
   //       Products.find((item) => item.sub_category === (params.get("sub_category")))
@@ -94,20 +104,27 @@ const Filter = () => {
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart)); // Create a copy of productsInCart
+    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
 
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      console.log(newProductsToCart[pIndex][unit]);
       newProductsToCart[pIndex][unit] = {
-        quantity: counters[pIndex][unit] || 1,
+        quantity: counters[pIndex][unit] || 1
       };
     }
 
-    setProductsInCart(newProductsToCart);
     dispatch(UPDATE_ITEMS(newProductsToCart));
-    console.log(dispatch(UPDATE_ITEMS(newProductsToCart)));
+    if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
+      return;
+    }
+
+    setProductsInCart(newProductsToCart);
+
+    localStorage.setItem(
+      localStorageKey,
+      JSON.stringify(newProductsToCart)
+    )
   };
 
   const getQuantity = (pIndex) => {

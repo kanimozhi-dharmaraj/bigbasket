@@ -609,9 +609,9 @@ const Filter = () => {
                       <Typography>
                         MRP{" "}
                         <span style={{ textDecoration: "line-through" }}>
-                          Rs. {prices[i]}
+                          Rs. {item.market_price}
                         </span>{" "}
-                        Rs.{selectedPrices[i]}
+                        Rs.{item.sale_price}
                       </Typography>
                       <Typography className="DeliveryDetail">
                         <img

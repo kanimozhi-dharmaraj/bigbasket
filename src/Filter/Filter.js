@@ -628,13 +628,15 @@ const Filter = () => {
                       </Typography>
                       {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
                       {getQuantity(item.index) === 0 ? (
-                        <div>
-                          <TextField
-                            id={`quantity-${item.index}`}
-                            sx={{ m: 1, width: "10ch" ,margin: "0.5rem"}}
-                            variant="filled"
-                            placeholder="1"
-                          />
+                        <div className="addButton">
+                           <TextField
+                        id={`quantity-${item.index}`}
+                        sx={{ m: 1, width: "8ch" ,marginTop:"0px"}}
+                        placeholder="Qty 1"
+                        size="small"
+                        variant="standard"
+                        
+                      />
                           <Button
                             variant="contained"
                             size="small"

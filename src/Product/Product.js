@@ -42,8 +42,8 @@ const Product = () => {
   useEffect(() => {
     if (product && product.units && product.units.length > 0) {
       const minQuantity = product.units[selectedVariants[product.index] || 0].unit;
-      const minMarketPrice = product.market_price * product.units[selectedVariants[product.index]].multiple;
-      const minSalePrice = product.sale_price * product.units[selectedVariants[product.index]].multiple;
+      const minMarketPrice = product.market_price * product.units[selectedVariants[product.index]]?.multiple;
+      const minSalePrice = product.sale_price * product.units[selectedVariants[product.index]]?.multiple;
       setClickedElement(minQuantity);
       setMarketPrice(minMarketPrice);
       setSalePrice(minSalePrice);
@@ -65,7 +65,7 @@ const Product = () => {
     let existingVariant = selectedVariants;
     existingVariant[index] = Number(unit);
 
-    if (productsInCart[index][unit] === undefined) {
+    if (productsInCart[index]?.[unit] === undefined) {
       setSelectedVariantQuantity(0);
     } else {
       setSelectedVariantQuantity(productsInCart[index][unit]['quantity'])

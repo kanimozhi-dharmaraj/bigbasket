@@ -221,17 +221,19 @@ const Home = () => {
                   </Typography>
                   {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
                   {getQuantity(item.index) === 0 ? (
-                    <div>
+                    <div className="addButton">
                       <TextField
                         id={`quantity-${item.index}`}
-                        sx={{ m: 1, width: "10ch" ,height: "0em",marginTop:"-25px"}}
-                        variant="filled"
+                        sx={{ m: 1, width: "8ch" ,marginTop:"0px"}}
                         placeholder="Qty 1"
+                        size="small"
+                        variant="standard"
+                        
                       />
                       <Button
                         variant="contained"
                         size="small"
-                        sx={{ color: "#FFFE9D" }}
+                        sx={{ color: "#000",background:"#f2cb76" }}
                         onClick={() => incrementCount(item.index)}
                       >
                         ADD

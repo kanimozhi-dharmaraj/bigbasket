@@ -289,7 +289,7 @@ const Home = () => {
                     width="100"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "200px" }}
+                    sx={{ height: "200px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>
@@ -311,7 +311,7 @@ const Home = () => {
                     height="140"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "200px" }}
+                    sx={{ height: "200px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>
@@ -337,7 +337,7 @@ const Home = () => {
                     height="140"
                     image={item.image}
                     alt="green iguana"
-                    sx={{ height: "150px", width: "200px" }}
+                    sx={{ height: "200px", width: "200px" }}
                     onClick={() => goToRelevantPage(item)}
                   />
                 </CardActionArea>

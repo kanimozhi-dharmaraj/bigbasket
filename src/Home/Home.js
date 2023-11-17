@@ -47,9 +47,10 @@ const Home = () => {
   const chooseVariant = (e) => {
     const value = e.target.value;
     const [index, unit] = value.split('-');
-    let newVariants = selectedVariants;
-    newVariants[index] = Number(unit);
-    setSelectedVariants(newVariants)
+    setSelectedVariants(prevVariants => ({
+      ...prevVariants,
+      [index-1]: Number(unit),
+    }));
   };
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
@@ -98,12 +99,6 @@ const Home = () => {
     )
   };
   
-
-  const getQuantity = (pIndex) => {
-    let unit = selectedVariants[pIndex] || 0;
-    return counters[pIndex]?.[unit] || 0;
-  }
-
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
@@ -118,32 +113,22 @@ const Home = () => {
   useEffect(() => {
     updateProductsInCart();
   }, [counters]);
-
-  // useEffect(() => {
-  //   //alert('Helll')
-  //   let salePriceArray = items.map((product, i) => product.sale_price * (product.units? product.units[selectedVariants[i] || 0].multiple : 1));
-  //   let marketPriceArray = items.map((product, i) => product.market_price * (product.units? product.units[selectedVariants[i] || 0].multiple : 1));
-  //   console.log(salePriceArray)
-  //   console.log(marketPriceArray)
-  //   setSalePrices(salePriceArray);
-  //   setMarketPrices(marketPriceArray);
-  // }, [items, selectedVariants]);
-  useEffect(() => {
-    // Calculate the new market prices based on the selected variants
+    
+  const calculatePrices = () => {
     const newMarketPrices = items.map((product, i) =>
-      product.market_price * (product.units ? product.units[selectedVariants[i] || 0].multiple : 1)
+      product.market_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)
     );
-    setMarketPrices(newMarketPrices);
-  }, [selectedVariants, items]);
 
-  useEffect(() => {
-    // Calculate the new sale prices based on the selected variants
     const newSalePrices = items.map((product, i) =>
-      product.sale_price * (product.units ? product.units[selectedVariants[i] || 0].multiple : 1)
+      product.sale_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)
     );
     setSalePrices(newSalePrices);
-  }, [selectedVariants, items]);
-    
+    setMarketPrices(newMarketPrices);
+  };
+
+  useEffect(() => {
+    calculatePrices();
+  }, [items,selectedVariants]);
 
   return (
     <div>
@@ -219,8 +204,7 @@ const Home = () => {
                       <span>9:00AM - 1:30PM</span>
                     </p>
                   </Typography>
-                  {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
-                  {getQuantity(item.index) === 0 ? (
+                  {!counters[item.index] ? (
                     <div className="addButton">
                       <TextField
                         id={`quantity-${item.index}`}
@@ -251,10 +235,9 @@ const Home = () => {
                       <input
                         type="number"
                         min="1"
-                        defaultValue={counters[item.index][selectedVariants[item.index] || 0]}
-                        value={counters[item.index][selectedVariants[item.index] || 0]}
+                        defaultValue={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
+                        value={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
                         className="form-control"
-                        onChange={getQuantity(item.index)}
                       />
                       <button
                         type="button"

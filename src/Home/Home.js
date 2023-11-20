@@ -24,7 +24,6 @@ const Home = () => {
   const [marketPrices, setMarketPrices] = useState([]);
   const [salePrices, setSalePrices] = useState([]);
   const [selectedVariants, setSelectedVariants] = useState({});
-  const [counters, setCounters] = useState({});
   const localStorageKey = "productState";
 
   const loadCartItemsFromStorage = () => {
@@ -39,10 +38,26 @@ const Home = () => {
     }
   };
 
+  function convertObject(inputObject) {
+    const resultObject = {};
+  
+    for (const key in inputObject) {
+      if (inputObject.hasOwnProperty(key)) {
+        if (typeof inputObject[key] === 'object' && inputObject[key] !== null) {
+          if (inputObject[key].hasOwnProperty(0) && inputObject[key][0].hasOwnProperty('quantity')) {
+            resultObject[key] = { 0: inputObject[key][0].quantity };
+          }
+        }
+      }
+    }
+  
+    return resultObject;
+  }
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const state = useSelector((data)=>data);
- 
+  const [counters, setCounters] = useState(convertObject(loadCartItemsFromStorage() || state.data.cartItems || {}));
   const [productsInCart, setProductsInCart] = useState(loadCartItemsFromStorage() || state.data.cartItems || {});
   const chooseVariant = (e) => {
     const value = e.target.value;
@@ -84,19 +99,20 @@ const Home = () => {
       newProductsToCart[pIndex][unit] = {
         quantity: counters[pIndex][unit] || 1
       };
+      
     }
 
     dispatch(UPDATE_ITEMS(newProductsToCart));
     if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
       return;
     }
-
     setProductsInCart(newProductsToCart);
 
     localStorage.setItem(
       localStorageKey,
       JSON.stringify(newProductsToCart)
     )
+    
   };
   
   const showProductDetails = (item) => {
@@ -112,15 +128,16 @@ const Home = () => {
 
   useEffect(() => {
     updateProductsInCart();
+    
   }, [counters]);
     
   const calculatePrices = () => {
     const newMarketPrices = items.map((product, i) =>
-      product.market_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)
+      (product.market_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)).toFixed(2)
     );
 
     const newSalePrices = items.map((product, i) =>
-      product.sale_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)
+      (product.sale_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)).toFixed(2)
     );
     setSalePrices(newSalePrices);
     setMarketPrices(newMarketPrices);
@@ -179,7 +196,7 @@ const Home = () => {
                       {item.units.map((unitObj, unitIndex)=>(
                       <MenuItem value={`${item.index}-${unitIndex}`}  sx={{color : "#666666"}} >
                         {unitObj.unit} - Rs.
-                        {item.sale_price * unitObj.multiple} 
+                        {(item.sale_price * unitObj.multiple).toFixed(2)} 
                       </MenuItem>))}
                     </Select>
                   </FormControl>
@@ -204,7 +221,7 @@ const Home = () => {
                       <span>9:00AM - 1:30PM</span>
                     </p>
                   </Typography>
-                  {!counters[item.index] ? (
+                  {!(counters[item.index] && counters[item.index][selectedVariants[item.index-1] || 0]) ? (
                     <div className="addButton">
                       <TextField
                         id={`quantity-${item.index}`}

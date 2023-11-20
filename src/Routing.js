@@ -10,7 +10,6 @@ import { store } from "./Redux/Store";
 
 const Routing = () => {
   const state = useSelector((data)=>data);
-  console.log("state",state)
 
   return (
     <BrowserRouter>

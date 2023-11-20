@@ -40,7 +40,7 @@ const Home = () => {
 
   function convertObject(inputObject) {
     const resultObject = {};
-  
+
     for (const key in inputObject) {
       if (inputObject.hasOwnProperty(key)) {
         if (typeof inputObject[key] === 'object' && inputObject[key] !== null) {
@@ -50,7 +50,7 @@ const Home = () => {
         }
       }
     }
-  
+
     return resultObject;
   }
 
@@ -64,7 +64,7 @@ const Home = () => {
     const [index, unit] = value.split('-');
     setSelectedVariants(prevVariants => ({
       ...prevVariants,
-      [index-1]: Number(unit),
+      [index - 1]: Number(unit),
     }));
   };
   const incrementCount = (id) => {
@@ -74,7 +74,7 @@ const Home = () => {
 
       newCounters[id] = newCounters[id] || {};
       newCounters[id][selectedVariant] = (newCounters[id][selectedVariant] || 0) + 1;
-      
+
       return newCounters;
     });
   };
@@ -99,7 +99,6 @@ const Home = () => {
       newProductsToCart[pIndex][unit] = {
         quantity: counters[pIndex][unit] || 1
       };
-      
     }
 
     dispatch(UPDATE_ITEMS(newProductsToCart));
@@ -112,9 +111,7 @@ const Home = () => {
       localStorageKey,
       JSON.stringify(newProductsToCart)
     )
-    
   };
-  
   const showProductDetails = (item) => {
     navigate(`/Product?id=${item.index}`);
   };
@@ -123,14 +120,20 @@ const Home = () => {
   };
 
   useEffect(() => {
+    if(JSON.stringify(productsInCart) != JSON.stringify(state.data.cartItems)) {
+      setProductsInCart(state.data.cartItems)
+      setCounters(convertObject(state.data.cartItems))  
+    }
+  }, [state]);
+
+  useEffect(() => {
     setItems(Products);
   }, [Products]);
 
   useEffect(() => {
     updateProductsInCart();
-    
   }, [counters]);
-    
+
   const calculatePrices = () => {
     const newMarketPrices = items.map((product, i) =>
       (product.market_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)).toFixed(2)
@@ -145,7 +148,7 @@ const Home = () => {
 
   useEffect(() => {
     calculatePrices();
-  }, [items,selectedVariants]);
+  }, [items, selectedVariants]);
 
   return (
     <div>
@@ -160,30 +163,30 @@ const Home = () => {
           <Grid item xs={12} sm={6} md={3} key={i}>
             <Card sx={{ maxWidth: 345 }}>
               <CardActionArea>
-                <div className="offer-box">GET {Math.round(((item.market_price-item.sale_price)/(item.market_price)) * 100)} % OFF</div>
+                <div className="offer-box">GET {Math.round(((item.market_price - item.sale_price) / (item.market_price)) * 100)} % OFF</div>
                 <CardMedia
                   component="img"
                   image={item.image}
                   alt="green iguana"
-                  sx={{ height: "150px", width: "150px", paddingLeft:'60px',paddingTop:"30px"}}
+                  sx={{ height: "150px", width: "150px", paddingLeft: '60px', paddingTop: "30px" }}
                   onClick={() => showProductDetails(item)}
                 />
-               
+
                 <img
                   src="https://www.bbassets.com/static/v2663/custPage/build/content/img/vegicon.svg"
-                  alt="veg-icon" style={{paddingLeft:"20px"}}
+                  alt="veg-icon" style={{ paddingLeft: "20px" }}
                 ></img>
-                
+
                 <CardContent>
                   <div className="brandName">{item.brand}</div>
                   <div
-                   
+
                     className="productName"
                     onClick={() => showProductDetails(item)}
                   >
                     {item.product}
                   </div>
-                  
+
                   <FormControl fullWidth>
                     <Select
                       labelId={`demo-simple-select-label-${item.index}`}
@@ -191,80 +194,80 @@ const Home = () => {
                       onChange={(e) => chooseVariant(e)}
                       defaultValue={`${item.index}-0`}
                       className="dropDownBox"
-                      sx={{color : "#666666"}}
+                      sx={{ color: "#666666" }}
                     >
-                      {item.units.map((unitObj, unitIndex)=>(
-                      <MenuItem value={`${item.index}-${unitIndex}`}  sx={{color : "#666666"}} >
-                        {unitObj.unit} - Rs.
-                        {(item.sale_price * unitObj.multiple).toFixed(2)} 
-                      </MenuItem>))}
+                      {item.units.map((unitObj, unitIndex) => (
+                        <MenuItem value={`${item.index}-${unitIndex}`} sx={{ color: "#666666" }} >
+                          {unitObj.unit} - Rs.
+                          {(item.sale_price * unitObj.multiple).toFixed(2)}
+                        </MenuItem>))}
                     </Select>
                   </FormControl>
                   <div className="basket-details">
-                  <div>
-                    <span className="mrpPriceStyle">MRP{" "}
-                    <span style={{ textDecoration: "line-through" }}></span>
-                     Rs. {marketPrices[i]} 
-                    </span>{" "}
-                    <span className="salePriceStyle">Rs.{salePrices[i]} </span>
-                  </div>
-                  <Typography className="DeliveryDetail">
-                    <img
-                      src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
-                      className="transport"
-                      alt="transport"
-                    ></img>
+                    <div>
+                      <span className="mrpPriceStyle">MRP{" "}
+                        <span style={{ textDecoration: "line-through" }}></span>
+                        Rs. {marketPrices[i]}
+                      </span>{" "}
+                      <span className="salePriceStyle">Rs.{salePrices[i]} </span>
+                    </div>
+                    <Typography className="DeliveryDetail">
+                      <img
+                        src="https://www.bbassets.com/static/v2662/custPage/build/content/img/standard-del-gray.svg"
+                        className="transport"
+                        alt="transport"
+                      ></img>
 
-                    <p className="deliveryTime">
-                      <span>Standard Delivery: Tomorrow</span>
-                      <br></br>
-                      <span>9:00AM - 1:30PM</span>
-                    </p>
-                  </Typography>
-                  {!(counters[item.index] && counters[item.index][selectedVariants[item.index-1] || 0]) ? (
-                    <div className="addButton">
-                      <TextField
-                        id={`quantity-${item.index}`}
-                        sx={{ m: 1, width: "8ch" ,marginTop:"0px"}}
-                        placeholder="Qty 1"
-                        size="small"
-                        variant="standard"
-                        
-                      />
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{ color: "#000",background:"#f2cb76" }}
-                        onClick={() => incrementCount(item.index)}
-                      >
-                        ADD
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="btn-group" role="group">
-                      <button
-                        type="button"
-                        className="btn btn-warning"
-                        onClick={() => decrementCount(item.index)}
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        defaultValue={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
-                        value={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
-                        className="form-control"
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-warning"
-                        onClick={() => incrementCount(item.index)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  )}
+                      <p className="deliveryTime">
+                        <span>Standard Delivery: Tomorrow</span>
+                        <br></br>
+                        <span>9:00AM - 1:30PM</span>
+                      </p>
+                    </Typography>
+                    {!(counters[item.index] && counters[item.index][selectedVariants[item.index - 1] || 0]) ? (
+                      <div className="addButton">
+                        <TextField
+                          id={`quantity-${item.index}`}
+                          sx={{ m: 1, width: "8ch", marginTop: "0px" }}
+                          placeholder="Qty 1"
+                          size="small"
+                          variant="standard"
+
+                        />
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={{ color: "#000", background: "#f2cb76" }}
+                          onClick={() => incrementCount(item.index)}
+                        >
+                          ADD
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="btn-group" role="group">
+                        <button
+                          type="button"
+                          className="btn btn-warning"
+                          onClick={() => decrementCount(item.index)}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          defaultValue={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
+                          value={counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]}
+                          className="form-control"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-warning"
+                          onClick={() => incrementCount(item.index)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </CardActionArea>

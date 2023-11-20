@@ -23,6 +23,7 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import ClearIcon from "@mui/icons-material/Clear";
+import { UPDATE_ITEMS } from "../Redux/stateSlice";
 
 const Header = () => {
   const [totalProductsInCart, setTotalProductsInCart] = useState(0);
@@ -100,6 +101,7 @@ const Header = () => {
     cartItems[id][unitIndex]["quantity"] =
       cartItems[id][unitIndex]["quantity"] + 1;
     setProductsInCart(cartItems);
+    dispatch(UPDATE_ITEMS(cartItems));
   };
 
   const decrementCount = (id, unitIndex) => {
@@ -109,6 +111,7 @@ const Header = () => {
       1
     );
     setProductsInCart(cartItems);
+    dispatch(UPDATE_ITEMS(cartItems));
   };
 
   const showItemsInCart = () => {

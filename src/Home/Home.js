@@ -38,16 +38,13 @@ const Home = () => {
     }
   };
 
-  function convertObject(inputObject) {
+  function convertObject(quantityObject) {
     const resultObject = {};
 
-    for (const key in inputObject) {
-      if (inputObject.hasOwnProperty(key)) {
-        if (typeof inputObject[key] === 'object' && inputObject[key] !== null) {
-          if (inputObject[key].hasOwnProperty(0) && inputObject[key][0].hasOwnProperty('quantity')) {
-            resultObject[key] = { 0: inputObject[key][0].quantity };
-          }
-        }
+    for (const productId in quantityObject) {
+      resultObject[productId] =  resultObject[productId] || {}
+      for (const unitId in quantityObject[productId]) {
+        resultObject[productId][unitId] = quantityObject[productId][unitId]['quantity']
       }
     }
 
@@ -64,9 +61,10 @@ const Home = () => {
     const [index, unit] = value.split('-');
     setSelectedVariants(prevVariants => ({
       ...prevVariants,
-      [index - 1]: Number(unit),
+      [index]: Number(unit),
     }));
   };
+
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
       const newCounters = { ...prevCounters };
@@ -91,14 +89,18 @@ const Home = () => {
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
+    let newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
 
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      newProductsToCart[pIndex][unit] = {
-        quantity: counters[pIndex][unit] || 1
-      };
+      if((counters[pIndex][unit] === 0 && newProductsToCart[pIndex][unit]) || counters[pIndex][unit] === undefined) {
+        delete newProductsToCart[pIndex][unit];
+      } else {
+        newProductsToCart[pIndex][unit] = {
+          quantity: counters[pIndex][unit]
+        };
+      }
     }
 
     dispatch(UPDATE_ITEMS(newProductsToCart));
@@ -106,6 +108,7 @@ const Home = () => {
       return;
     }
     setProductsInCart(newProductsToCart);
+    setCounters(convertObject(newProductsToCart));
 
     localStorage.setItem(
       localStorageKey,
@@ -136,11 +139,11 @@ const Home = () => {
 
   const calculatePrices = () => {
     const newMarketPrices = items.map((product, i) =>
-      (product.market_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)).toFixed(2)
+      (product.market_price * (product.units ? product.units[selectedVariants[i+1] || 0]?.multiple : 1)).toFixed(2)
     );
 
     const newSalePrices = items.map((product, i) =>
-      (product.sale_price * (product.units ? product.units[selectedVariants[i] || 0]?.multiple : 1)).toFixed(2)
+      (product.sale_price * (product.units ? product.units[selectedVariants[i+1] || 0]?.multiple : 1)).toFixed(2)
     );
     setSalePrices(newSalePrices);
     setMarketPrices(newMarketPrices);
@@ -207,9 +210,9 @@ const Home = () => {
                     <div>
                       <span className="mrpPriceStyle">MRP{" "}
                         <span style={{ textDecoration: "line-through" }}></span>
-                        Rs. {marketPrices[i]}
+                        Rs. {marketPrices[Number(item.index)-1]}
                       </span>{" "}
-                      <span className="salePriceStyle">Rs.{salePrices[i]} </span>
+                      <span className="salePriceStyle">Rs.{salePrices[Number(item.index)-1]} </span>
                     </div>
                     <Typography className="DeliveryDetail">
                       <img
@@ -219,12 +222,12 @@ const Home = () => {
                       ></img>
 
                       <p className="deliveryTime">
-                        <span>Standard Delivery: Tomorrow</span>
+                        <span>Standard Delivery: Tomorrow {JSON.stringify(counters[item.index])}</span>
                         <br></br>
                         <span>9:00AM - 1:30PM</span>
                       </p>
                     </Typography>
-                    {!(counters[item.index] && counters[item.index][selectedVariants[item.index - 1] || 0]) ? (
+                    {!(counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]) ? (
                       <div className="addButton">
                         <TextField
                           id={`quantity-${item.index}`}

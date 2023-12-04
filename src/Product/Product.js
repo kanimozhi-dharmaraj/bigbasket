@@ -34,6 +34,22 @@ const Product = () => {
     }
   };
 
+  function convertObject(quantityObject) {
+    const resultObject = {};
+    const selectedVariantObj = {}
+
+    for (const productId in quantityObject) {
+      resultObject[productId] =  resultObject[productId] || {}
+      for (const unitId in quantityObject[productId]) {
+        resultObject[productId][unitId] = quantityObject[productId][unitId]['quantity']
+        selectedVariantObj[productId] = unitId
+      }
+    }
+    setSelectedVariants(selectedVariantObj)
+
+    return resultObject;
+  }
+
   useEffect(() => {
     setProduct(
       Products.find((item) => item.index === parseInt(params.get("id")))
@@ -94,29 +110,31 @@ const Product = () => {
 
       newCounters[id] = newCounters[id] || {};
       newCounters[id][selectedVariant] = Math.max((newCounters[id][selectedVariant] || 0) - 1, 0);
-      setSelectedVariantQuantity(newCounters[id][selectedVariant]);
-
       return newCounters;
     });
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
+    let newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
 
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      newProductsToCart[pIndex][unit] = {
-        quantity: counters[pIndex][unit] || 1
-      };
+      if((counters[pIndex][unit] === 0 && newProductsToCart[pIndex][unit]) || counters[pIndex][unit] === undefined) {
+        delete newProductsToCart[pIndex][unit];
+      } else {
+        newProductsToCart[pIndex][unit] = {
+          quantity: counters[pIndex][unit]
+        };
+      }
     }
 
     dispatch(UPDATE_ITEMS(newProductsToCart));
     if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
       return;
     }
-
     setProductsInCart(newProductsToCart);
+    setCounters(convertObject(newProductsToCart));
 
     localStorage.setItem(
       localStorageKey,

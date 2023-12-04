@@ -58,6 +58,18 @@ const Filter = () => {
   };
   const [productsInCart, setProductsInCart] = useState(loadCartItemsFromStorage() || state.data.cartItems || {});
 
+  function convertObject(quantityObject) {
+    const resultObject = {};
+
+    for (const productId in quantityObject) {
+      resultObject[productId] =  resultObject[productId] || {}
+      for (const unitId in quantityObject[productId]) {
+        resultObject[productId][unitId] = quantityObject[productId][unitId]['quantity']
+      }
+    }
+
+    return resultObject;
+  }
   // useEffect(() => {
   //     setProduct(
   //       Products.find((item) => item.sub_category === (params.get("sub_category")))
@@ -68,13 +80,12 @@ const Filter = () => {
   //   Products.filter((item) => item.sub_category === params.get("sub_category"))
   // );
   const chooseVariant = (e) => {
-    // 1st {1: 0, 2:3}
     const value = e.target.value;
-    const [index, unit] = value.split("-");
-    let existingVariant = selectedVariants;
-    existingVariant[index] = Number(unit);
-    console.log(existingVariant);
-    setSelectedVariants(existingVariant);
+    const [index, unit] = value.split('-');
+    setSelectedVariants(prevVariants => ({
+      ...prevVariants,
+      [index]: Number(unit),
+    }));
   };
   const incrementCount = (id) => {
     setCounters((prevCounters) => {
@@ -104,22 +115,26 @@ const Filter = () => {
   };
 
   const updateProductsInCart = () => {
-    const newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
+    let newProductsToCart = JSON.parse(JSON.stringify(productsInCart));
 
     for (const pIndex in counters) {
       const unit = selectedVariants[pIndex] || 0;
       newProductsToCart[pIndex] = newProductsToCart[pIndex] || {};
-      newProductsToCart[pIndex][unit] = {
-        quantity: counters[pIndex][unit] || 1
-      };
+      if((counters[pIndex][unit] === 0 && newProductsToCart[pIndex][unit]) || counters[pIndex][unit] === undefined) {
+        delete newProductsToCart[pIndex][unit];
+      } else {
+        newProductsToCart[pIndex][unit] = {
+          quantity: counters[pIndex][unit]
+        };
+      }
     }
 
     dispatch(UPDATE_ITEMS(newProductsToCart));
     if (JSON.stringify(newProductsToCart) === localStorage.getItem(localStorageKey)) {
       return;
     }
-
     setProductsInCart(newProductsToCart);
+    setCounters(convertObject(newProductsToCart));
 
     localStorage.setItem(
       localStorageKey,
@@ -626,8 +641,7 @@ const Filter = () => {
                           <span>9:00AM - 1:30PM</span>
                         </p>
                       </Typography>
-                      {/* counters[item.index] === undefined || counters[item.index][selectedVariants[item.index] || 0] */}
-                      {getQuantity(item.index) === 0 ? (
+                      {!(counters[item.index] && counters[item.index][selectedVariants[item.index] || 0]) ? (
                         <div className="addButton">
                            <TextField
                         id={`quantity-${item.index}`}
